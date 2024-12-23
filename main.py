@@ -122,7 +122,7 @@ async def write_to_cloudflare_d1(session, data, api_token, account_id, database_
     
     payload = {
         "sql": "INSERT INTO wayback_data (url, timestamp) VALUES (?, ?)",
-        "params": [data['url'], current_time]
+        "params": [data['url'],data ['date'],current_time]
     }
 
     try:
@@ -164,17 +164,18 @@ async def geturls(domain, api_token, account_id, database_id):
                 content = await resp.text()
                 lines = content.splitlines()
                 
-                fieldnames = ['date', 'url']
                 os.makedirs('./result', exist_ok=True)
                 
                 print(f"\nProcessing {len(lines)} URLs...")
                 for line in lines:
                     if ' ' in line:
-                        data = {'url': line.strip()}
+                        url=line.strip().split(' ')[1]
+                        date=line.strip().split(' ')[1]
+                        data={
+                            "url":url,
+                            "date":date
+                        }
                         # Write to CSV
-                        with open(csv_file, mode='a', newline='', encoding='utf-8') as f:
-                            writer = csv.DictWriter(f, fieldnames=fieldnames)
-                            writer.writerow(data)
                         # Write to Cloudflare D1
                         await write_to_cloudflare_d1(session, data, api_token, account_id, database_id)
 
@@ -197,7 +198,9 @@ async def create_table(api_token, account_id, database_id):
         CREATE TABLE IF NOT EXISTS wayback_data (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             url TEXT NOT NULL,
-            timestamp TEXT NOT NULL
+            date TEXT NOT NULL,
+
+            updateAt TEXT NOT NULL
         )
         """
     }
