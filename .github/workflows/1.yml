@@ -1,0 +1,39 @@
+name: zhbiao
+
+on:
+  workflow_dispatch:
+    inputs:
+      keyword:
+        description: 'Enter keyword(s) - separate multiple keywords with commas'
+        required: true
+        type: string
+  # schedule:
+  #   - cron: '0 0 */30 * *' # 每30天运行一次
+  # push:
+  #   branches:
+  #     - main
+
+jobs:
+  search_volume:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: |
+          pip install DrissionPage
+          pip install python-dotenv
+
+      - name: Create env file
+        run: |
+          echo "keyword=${{ github.event.inputs.keyword }}" > .env
+
+      - name: Run Script
+        run: |
+          python zhongbiao.py
