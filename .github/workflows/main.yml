@@ -27,9 +27,8 @@ jobs:
 
     - name: Run the Google search parser script
       run: |
-        python google_search_parser_from_wayback.py \
-          --input_file ${{ github.event.inputs.wayback_machine_results_file }} \
-          --output_file ${{ github.event.inputs.output_file }}
+        python main.py \
+          --domain ${{ github.event.inputs.domain }} \
 
     - name: Commit the results to the repository if there's a change
       run: |
