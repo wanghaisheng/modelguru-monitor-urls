@@ -110,5 +110,5 @@ def create_table_in_cloudflare_d1():
     else:
         print(f"Failed to create table: {response.text()}")
 
-create_table_in_cloudflare_d1()
+# create_table_in_cloudflare_d1()
 asyncio.run(geturls(domain))
