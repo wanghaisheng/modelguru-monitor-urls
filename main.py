@@ -22,7 +22,7 @@ domain = os.getenv('domain')
 if domain is None:
     domain='https://www.amazon.com/sp'
 
-os.makedirs(os.path.dirname('result'), exist_ok=True)
+os.makedirs('./result', exist_ok=True)
 
 async def geturls(domain):
     no_subs=None
