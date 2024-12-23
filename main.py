@@ -4,7 +4,6 @@ import os
 import asyncio
 import datetime
 from dotenv import load_dotenv
-import requests
 import sys
 
 load_dotenv()
@@ -37,19 +36,21 @@ async def test_cloudflare_connection(api_token, account_id, database_id):
     # Updated headers with correct authorization format
     headers = {
         "Content-Type": "application/json",
+        # Changed Bearer to just the token
         "Authorization": f"Bearer {api_token}"
-    }
-    
-    payload = {
-        "sql": "SELECT 1"
     }
     
     print(f"\nTesting Cloudflare connection...")
     print(f"URL: {url}")
+    print("Current UTC time:", datetime.datetime.utcnow().isoformat())
     
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers) as response:
+                response_text = await response.text()
+                print(f"Response Status: {response.status}")
+                print(f"Response Body: {response_text}")
+                
                 if response.status == 200:
                     data = await response.json()
                     if data.get('success'):
@@ -58,7 +59,7 @@ async def test_cloudflare_connection(api_token, account_id, database_id):
                     else:
                         print(f"✗ Cloudflare API error: {data}")
                 else:
-                    print(f"✗ HTTP Status {response.status}: {await response.text()}")
+                    print(f"✗ HTTP Status {response.status}: {response_text}")
                 return False
     except Exception as e:
         print(f"✗ Connection error: {str(e)}")
@@ -68,15 +69,16 @@ async def write_to_cloudflare_d1(session, data, api_token, account_id, database_
     """Write data to Cloudflare D1"""
     url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/databases/{database_id}/query"
     
-    # Updated headers with correct authorization format
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {api_token}"
     }
     
+    current_time = datetime.datetime.utcnow().isoformat()
+    
     payload = {
         "sql": "INSERT INTO wayback_data (url, timestamp) VALUES (?, ?)",
-        "parameters": [data['url'], datetime.datetime.utcnow().isoformat()]
+        "parameters": [data['url'], current_time]
     }
 
     try:
@@ -84,8 +86,9 @@ async def write_to_cloudflare_d1(session, data, api_token, account_id, database_
             if response.status == 200:
                 print(f"✓ Successfully inserted: {data['url']}")
             else:
+                error_text = await response.text()
                 print(f"✗ Failed to insert: {data['url']}")
-                print(f"Error: {await response.text()}")
+                print(f"Error: {error_text}")
     except Exception as e:
         print(f"✗ Error writing to Cloudflare: {str(e)}")
 
@@ -146,23 +149,23 @@ async def create_table(api_token, account_id, database_id):
     )
     """
     
-    payload = {
-        "sql": sql
-    }
-
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers) as response:
                 if response.status == 200:
                     print("✓ Table created/verified successfully")
                 else:
-                    print(f"✗ Failed to create table: {await response.text()}")
+                    error_text = await response.text()
+                    print(f"✗ Failed to create table: {error_text}")
     except Exception as e:
         print(f"✗ Error creating table: {str(e)}")
 
 async def main():
     # Check environment variables
     env_vars = check_environment_variables()
+    
+    print("Starting script execution...")
+    print(f"Current time (UTC): {datetime.datetime.utcnow().isoformat()}")
     
     # Test Cloudflare connection
     if not await test_cloudflare_connection(
