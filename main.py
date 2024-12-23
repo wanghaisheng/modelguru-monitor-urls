@@ -17,7 +17,34 @@ api_token = os.getenv('CLOUDFLARE_API_TOKEN')
 account_id = os.getenv('CLOUDFLARE_ACCOUNT_ID')
 database_id = os.getenv('CLOUDFLARE_D1_DATABASE_ID')
 
+# Debugging logs to ensure environment variables are loaded
+print(f"domain: {domain}")
+print(f"proxy_url: {proxy_url}")
+print(f"api_token: {api_token}")
+print(f"account_id: {account_id}")
+print(f"database_id: {database_id}")
+
 os.makedirs('./result', exist_ok=True)
+
+# Function to test the connection to Cloudflare
+def test_connection():
+    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/databases/{database_id}/query"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_token}"
+    }
+    payload = {
+        "query": "SELECT 1"
+    }
+    response = requests.post(url, headers=headers, json=payload)
+    if response.status_code == 200 and response.json().get("success"):
+        print("Connection to Cloudflare API successful.")
+    else:
+        print(f"Failed to connect to Cloudflare API: {response.text}")
+        raise SystemExit("Exiting due to failed connection test.")
+
+# Call the test connection function
+test_connection()
 
 async def geturls(domain):
     no_subs = None
@@ -108,7 +135,7 @@ def create_table_in_cloudflare_d1():
     if response.status_code == 200:
         print("Table 'wayback_data' created successfully.")
     else:
-        print(f"Failed to create table: {response.text()}")
+        print(f"Failed to create table: {response.text}")
 
 # create_table_in_cloudflare_d1()
-asyncio.run(geturls(domain))
+# asyncio.run(geturls(domain))
