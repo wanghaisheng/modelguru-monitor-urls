@@ -32,22 +32,24 @@ def check_environment_variables():
 
 async def test_cloudflare_connection(api_token, account_id, database_id):
     """Test connection to Cloudflare API"""
-    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/query"
+    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/databases/{database_id}/query"
+    
+    # Updated headers with correct authorization format
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {api_token}"
     }
+    
     payload = {
         "sql": "SELECT 1"
     }
     
     print(f"\nTesting Cloudflare connection...")
     print(f"URL: {url}")
-    print(f"Headers: {headers}")
     
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.post(url, headers=headers, json=payload) as response:
+            async with session.get(url, headers=headers) as response:
                 if response.status == 200:
                     data = await response.json()
                     if data.get('success'):
@@ -64,18 +66,21 @@ async def test_cloudflare_connection(api_token, account_id, database_id):
 
 async def write_to_cloudflare_d1(session, data, api_token, account_id, database_id):
     """Write data to Cloudflare D1"""
-    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/query"
+    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/databases/{database_id}/query"
+    
+    # Updated headers with correct authorization format
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {api_token}"
     }
+    
     payload = {
         "sql": "INSERT INTO wayback_data (url, timestamp) VALUES (?, ?)",
-        "params": [data['url'], datetime.datetime.utcnow().isoformat()]
+        "parameters": [data['url'], datetime.datetime.utcnow().isoformat()]
     }
 
     try:
-        async with session.post(url, headers=headers, json=payload) as response:
+        async with session.get(url, headers=headers) as response:
             if response.status == 200:
                 print(f"✓ Successfully inserted: {data['url']}")
             else:
@@ -113,9 +118,9 @@ async def geturls(domain, api_token, account_id, database_id):
                     if ' ' in line:
                         data = {'url': line.strip()}
                         # Write to CSV
-                        # with open(csv_file, mode='a', newline='', encoding='utf-8') as f:
-                            # writer = csv.DictWriter(f, fieldnames=fieldnames)
-                            # writer.writerow(data)
+                        with open(csv_file, mode='a', newline='', encoding='utf-8') as f:
+                            writer = csv.DictWriter(f, fieldnames=fieldnames)
+                            writer.writerow(data)
                         # Write to Cloudflare D1
                         await write_to_cloudflare_d1(session, data, api_token, account_id, database_id)
 
@@ -123,6 +128,37 @@ async def geturls(domain, api_token, account_id, database_id):
 
         except Exception as e:
             print(f"✗ Error: {str(e)}")
+
+async def create_table(api_token, account_id, database_id):
+    """Create the wayback_data table if it doesn't exist"""
+    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/databases/{database_id}/query"
+    
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_token}"
+    }
+    
+    sql = """
+    CREATE TABLE IF NOT EXISTS wayback_data (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        url TEXT NOT NULL,
+        timestamp TEXT NOT NULL
+    )
+    """
+    
+    payload = {
+        "sql": sql
+    }
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=headers) as response:
+                if response.status == 200:
+                    print("✓ Table created/verified successfully")
+                else:
+                    print(f"✗ Failed to create table: {await response.text()}")
+    except Exception as e:
+        print(f"✗ Error creating table: {str(e)}")
 
 async def main():
     # Check environment variables
@@ -135,6 +171,13 @@ async def main():
         env_vars['CLOUDFLARE_D1_DATABASE_ID']
     ):
         sys.exit(1)
+
+    # Create table
+    await create_table(
+        env_vars['CLOUDFLARE_API_TOKEN'],
+        env_vars['CLOUDFLARE_ACCOUNT_ID'],
+        env_vars['CLOUDFLARE_D1_DATABASE_ID']
+    )
 
     # Process URLs
     await geturls(
