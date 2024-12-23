@@ -1,12 +1,12 @@
 name: domain url Parser from Wayback Machine
 
 on:
-  workflow_dispatch:  # This allows manual trigger from the GitHub UI.
+  workflow_dispatch:
     inputs:
-        domain:
-          description: 'domain url'
-          required: false
-          type: string
+      domain:
+        description: 'domain url'
+        required: false
+        type: string
 
 jobs:
   google_search:
@@ -26,9 +26,13 @@ jobs:
         pip install DataRecorder aiohttp pandas python-dotenv httpx cloudflare requests
 
     - name: Run the Google search parser script
+      env:
+        DOMAIN: ${{ github.event.inputs.domain }}
+        CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        CLOUDFLARE_D1_DATABASE_ID: ${{ secrets.CLOUDFLARE_D1_DATABASE_ID }}
       run: |
-        python main.py \
-          --domain ${{ github.event.inputs.domain }} \
+        python main.py
 
     - name: Commit the results to the repository if there's a change
       run: |
