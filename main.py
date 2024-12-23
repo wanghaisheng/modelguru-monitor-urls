@@ -14,7 +14,6 @@ load_dotenv()
 domain = os.getenv('domain')
 if domain is None:
     domain = 'https://www.amazon.com/sp'
-proxy_url = os.getenv('proxy_url')
 api_token = os.getenv('CLOUDFLARE_API_TOKEN')
 account_id = os.getenv('CLOUDFLARE_ACCOUNT_ID')
 database_id = os.getenv('CLOUDFLARE_D1_DATABASE_ID')
@@ -60,9 +59,9 @@ async def geturls(domain):
                 for line in lines:
                     if ' ' in line:
                         data = {'url': line.strip()}
-                        with open(csv_file, mode='a', newline='', encoding='utf-8') as f:
-                            writer = csv.DictWriter(f, fieldnames=fieldnames)
-                            writer.writerow(data)
+                        # with open(csv_file, mode='a', newline='', encoding='utf-8') as f:
+                            # writer = csv.DictWriter(f, fieldnames=fieldnames)
+                            # writer.writerow(data)
                         # Write to Cloudflare D1 table
                         await write_to_cloudflare_d1(data)
 
