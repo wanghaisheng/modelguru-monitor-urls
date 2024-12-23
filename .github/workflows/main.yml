@@ -23,7 +23,7 @@ jobs:
 
     - name: Install required Python dependencies
       run: |
-        pip install DataRecorder aiohttp pandas
+        pip install DataRecorder aiohttp pandas python-dotenv
 
     - name: Run the Google search parser script
       run: |
