@@ -47,7 +47,7 @@ def check_environment_variables():
         'CLOUDFLARE_API_TOKEN': os.getenv('CLOUDFLARE_API_TOKEN'),
         'CLOUDFLARE_ACCOUNT_ID': os.getenv('CLOUDFLARE_ACCOUNT_ID'),
         'CLOUDFLARE_D1_DATABASE_ID': os.getenv('CLOUDFLARE_D1_DATABASE_ID'),
-        'TIME_FRAME': os.getenv('TIME_FRAME', '2')
+        'TIME_FRAME': os.getenv('TIME_FRAME', '0')
     }
 
     missing_vars = [var for var, value in required_vars.items() if not value]
