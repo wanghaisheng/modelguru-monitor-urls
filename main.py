@@ -31,12 +31,11 @@ def check_environment_variables():
 
 async def test_cloudflare_connection(api_token, account_id, database_id):
     """Test connection to Cloudflare API"""
-    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/databases/{database_id}/query"
+    # Updated URL format for D1
+    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/database/{database_id}"
     
-    # Updated headers with correct authorization format
     headers = {
         "Content-Type": "application/json",
-        # Changed Bearer to just the token
         "Authorization": f"Bearer {api_token}"
     }
     
@@ -67,7 +66,7 @@ async def test_cloudflare_connection(api_token, account_id, database_id):
 
 async def write_to_cloudflare_d1(session, data, api_token, account_id, database_id):
     """Write data to Cloudflare D1"""
-    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/databases/{database_id}/query"
+    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/database/{database_id}/query"
     
     headers = {
         "Content-Type": "application/json",
@@ -78,11 +77,11 @@ async def write_to_cloudflare_d1(session, data, api_token, account_id, database_
     
     payload = {
         "sql": "INSERT INTO wayback_data (url, timestamp) VALUES (?, ?)",
-        "parameters": [data['url'], current_time]
+        "params": [data['url'], current_time]
     }
 
     try:
-        async with session.get(url, headers=headers) as response:
+        async with session.post(url, headers=headers, json=payload) as response:
             if response.status == 200:
                 print(f"✓ Successfully inserted: {data['url']}")
             else:
@@ -134,24 +133,26 @@ async def geturls(domain, api_token, account_id, database_id):
 
 async def create_table(api_token, account_id, database_id):
     """Create the wayback_data table if it doesn't exist"""
-    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/databases/{database_id}/query"
+    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/database/{database_id}/query"
     
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {api_token}"
     }
     
-    sql = """
-    CREATE TABLE IF NOT EXISTS wayback_data (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        url TEXT NOT NULL,
-        timestamp TEXT NOT NULL
-    )
-    """
+    payload = {
+        "sql": """
+        CREATE TABLE IF NOT EXISTS wayback_data (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            url TEXT NOT NULL,
+            timestamp TEXT NOT NULL
+        )
+        """
+    }
     
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers=headers) as response:
+            async with session.post(url, headers=headers, json=payload) as response:
                 if response.status == 200:
                     print("✓ Table created/verified successfully")
                 else:
