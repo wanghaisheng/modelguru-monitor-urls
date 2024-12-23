@@ -7,14 +7,59 @@ from dotenv import load_dotenv
 import sys
 
 load_dotenv()
+filters = ['30_days', '7_days', '1_day', '1_year', '6_months', '3_months']
+
+def get_time_range(filter_option):
+    """
+    Calculate start and end timestamps for Wayback Machine API based on filter option.
+    Returns timestamps in YYYYMMDDHHMMSS format.
+    
+    Args:
+        filter_option (str): One of '30_days', '7_days', '1_day'
+    
+    Returns:
+        tuple: (start_timestamp, end_timestamp)
+    """
+    now = datetime.datetime.utcnow()  # Use UTC time
+    
+    # Define the time ranges
+    time_ranges = {
+        '30_days': 30,
+        '7_days': 7,
+        '1_day': 1,
+        '1_year': 365,
+        '6_months': 180,
+        '3_months': 90
+    }
+    
+    if filter_option not in time_ranges:
+        raise ValueError(f"Invalid filter. Choose from: {', '.join(time_ranges.keys())}")
+    
+    # Calculate start date
+    start = (now - datetime.timedelta(days=time_ranges[filter_option]))
+    end = now
+
+    # Format timestamps in YYYYMMDDHHMMSS format
+    start_timestamp = start.strftime("%Y%m%d%H%M%S")
+    end_timestamp = end.strftime("%Y%m%d%H%M%S")
+
+    print(f"Date range: {start.isoformat()} to {end.isoformat()} UTC")
+    return start_timestamp, end_timestamp
+
+# Example usage:
+    # Test the function with different filters
+    
 
 def check_environment_variables():
     """Check and validate required environment variables"""
+    
     required_vars = {
-        'DOMAIN': os.getenv('domain', 'https://www.amazon.com/sp'),
+
+        'DOMAIN': os.getenv('domain', 'https://www.amazon.com/sp?ie=UTF8&seller='),
         'CLOUDFLARE_API_TOKEN': os.getenv('CLOUDFLARE_API_TOKEN'),
         'CLOUDFLARE_ACCOUNT_ID': os.getenv('CLOUDFLARE_ACCOUNT_ID'),
         'CLOUDFLARE_D1_DATABASE_ID': os.getenv('CLOUDFLARE_D1_DATABASE_ID')
+        'timeframe':os.getenv('TIME_FRAME',2)
     }
 
     missing_vars = [var for var, value in required_vars.items() if not value]
@@ -96,7 +141,14 @@ async def geturls(domain, api_token, account_id, database_id):
     domainname = domain.replace("https://", "").split('/')[0]
     csv_file = f'waybackmachines-{domainname}.csv'
     query_url = f"http://web.archive.org/cdx/search/cdx?url={domain}/&matchType=prefix&fl=timestamp,original&collapse=urlkey"
-    
+    start, end = get_time_range(filters[timeframe])
+
+    if not end: 
+        filter=f'&statuscode=200&from={start}'
+    else:
+        filter=f'&statuscode=200&from={start}&to={end}'
+    query_url=query_url+filter
+
     headers = {
         'Referer': 'https://web.archive.org/',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
