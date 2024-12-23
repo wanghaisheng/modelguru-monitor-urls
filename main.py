@@ -22,6 +22,7 @@ domain = os.getenv('domain')
 if domain is None:
     domain='https://www.amazon.com/sp'
 
+os.makedirs(os.path.dirname('result'), exist_ok=True)
 
 async def geturls(domain):
     no_subs=None
@@ -30,7 +31,9 @@ async def geturls(domain):
     domainname = domain.replace("https://", "")
     domainname=domainname.split('/')[0]
     csv_file=f'waybackmachines-{domainname}.csv'
-    outfile=Recorder(f'waybackmachines-{domainname}.csv')
+    date_today = datetime.date.today().strftime("%Y-%m-%d")
+
+    outfile=Recorder(f'result/{domainname}-{date_today}.csv')
 
     query_url = f"http://web.archive.org/cdx/search/cdx?url={subs_wildcard}{domain}/&fl=timestamp,original,mimetype,statuscode,digest"
     query_url = f"http://web.archive.org/cdx/search/cdx?url={domain}/&matchType=prefix&fl=timestamp,original"
