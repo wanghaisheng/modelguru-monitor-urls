@@ -3,6 +3,8 @@ import json,os
 from DataRecorder import Recorder
 import csv
 import asyncio
+from dotenv import load_dotenv
+load_dotenv()
 
 proxy_url=None
 domain='toolify.ai'
@@ -13,10 +15,14 @@ domain='https://www.amazon.com/sp?'
 domain='https://www.amazon.com/sp?_encoding=UTF8&marketplaceID=ATVPDKIKX0DER&orderID=&seller='
 domain='https://www.amazon.com/sp?_encoding=UTF8&marketplaceID='
 domain='https://www.amazon.com/sp'
-domain='revseller.com'
 domain='https://tophub.today'
 # domain='https://www.amazon.com/s'
 # domain='https://www.amazon.com/sp?ie=UTF8&seller='
+domain = os.getenv('domain')
+if domain is None:
+    domain='https://www.amazon.com/sp'
+
+
 async def geturls(domain):
     no_subs=None
     subs_wildcard = "*." if not no_subs else ""
