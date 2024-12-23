@@ -1,10 +1,10 @@
-name: Run
+name: Run urls
 
 on:
   workflow_dispatch:
     inputs:
-      keyword:
-        description: 'Enter keyword(s) - separate multiple keywords with commas'
+      domain:
+        description: 'Enter domain'
         required: true
         type: string
   # schedule:
@@ -27,13 +27,13 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install DrissionPage
+          pip install DrissionPage aiohttp DataRecorder
           pip install python-dotenv
 
       - name: Create env file
         run: |
-          echo "keyword=${{ github.event.inputs.keyword }}" > .env
+          echo "domain=${{ github.event.inputs.domain }}" > .env
 
       - name: Run Script
         run: |
-          python script.py
+          python main.py
