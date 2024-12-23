@@ -5,137 +5,144 @@ import asyncio
 import datetime
 from dotenv import load_dotenv
 import requests
+import sys
 
 load_dotenv()
 
-# Load environment variables
-domain = os.getenv('domain')
-if domain is None:
-    domain = 'https://www.amazon.com/sp'
-proxy_url = os.getenv('proxy_url')
-api_token = os.getenv('CLOUDFLARE_API_TOKEN')
-account_id = os.getenv('CLOUDFLARE_ACCOUNT_ID')
-database_id = os.getenv('CLOUDFLARE_D1_DATABASE_ID')
+def check_environment_variables():
+    """Check and validate required environment variables"""
+    required_vars = {
+        'DOMAIN': os.getenv('domain', 'https://www.amazon.com/sp'),
+        'CLOUDFLARE_API_TOKEN': os.getenv('CLOUDFLARE_API_TOKEN'),
+        'CLOUDFLARE_ACCOUNT_ID': os.getenv('CLOUDFLARE_ACCOUNT_ID'),
+        'CLOUDFLARE_D1_DATABASE_ID': os.getenv('CLOUDFLARE_D1_DATABASE_ID')
+    }
 
-# Debugging logs to ensure environment variables are loaded
-print(f"domain: {domain}")
-print(f"proxy_url: {proxy_url}")
-print(f"api_token: {api_token}")
-print(f"account_id: {account_id}")
-print(f"database_id: {database_id}")
+    missing_vars = [var for var, value in required_vars.items() if not value]
+    
+    if missing_vars:
+        print(f"Error: Missing required environment variables: {', '.join(missing_vars)}")
+        print("\nCurrent environment variables:")
+        for var, value in required_vars.items():
+            masked_value = '***' if value and var != 'DOMAIN' else value
+            print(f"{var}: {masked_value}")
+        sys.exit(1)
 
-os.makedirs('./result', exist_ok=True)
+    return required_vars
 
-# Function to test the connection to Cloudflare
-def test_connection():
-    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/databases/{database_id}/query"
+async def test_cloudflare_connection(api_token, account_id, database_id):
+    """Test connection to Cloudflare API"""
+    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/query"
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {api_token}"
     }
     payload = {
-        "query": "SELECT 1"
+        "sql": "SELECT 1"
     }
-    response = requests.post(url, headers=headers, json=payload)
-    if response.status_code == 200 and response.json().get("success"):
-        print("Connection to Cloudflare API successful.")
-    else:
-        print(f"Failed to connect to Cloudflare API: {response.text}")
-        raise SystemExit("Exiting due to failed connection test.")
+    
+    print(f"\nTesting Cloudflare connection...")
+    print(f"URL: {url}")
+    print(f"Headers: {headers}")
+    
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, headers=headers, json=payload) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if data.get('success'):
+                        print("✓ Cloudflare connection successful")
+                        return True
+                    else:
+                        print(f"✗ Cloudflare API error: {data}")
+                else:
+                    print(f"✗ HTTP Status {response.status}: {await response.text()}")
+                return False
+    except Exception as e:
+        print(f"✗ Connection error: {str(e)}")
+        return False
 
-# Call the test connection function
-test_connection()
+async def write_to_cloudflare_d1(session, data, api_token, account_id, database_id):
+    """Write data to Cloudflare D1"""
+    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/query"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_token}"
+    }
+    payload = {
+        "sql": "INSERT INTO wayback_data (url, timestamp) VALUES (?, ?)",
+        "params": [data['url'], datetime.datetime.utcnow().isoformat()]
+    }
 
-async def geturls(domain):
-    no_subs = None
-    subs_wildcard = "*." if not no_subs else ""
-    domainname = domain.replace("https://", "")
-    domainname = domainname.split('/')[0]
+    try:
+        async with session.post(url, headers=headers, json=payload) as response:
+            if response.status == 200:
+                print(f"✓ Successfully inserted: {data['url']}")
+            else:
+                print(f"✗ Failed to insert: {data['url']}")
+                print(f"Error: {await response.text()}")
+    except Exception as e:
+        print(f"✗ Error writing to Cloudflare: {str(e)}")
+
+async def geturls(domain, api_token, account_id, database_id):
+    """Fetch URLs from Wayback Machine and store them"""
+    domainname = domain.replace("https://", "").split('/')[0]
     csv_file = f'waybackmachines-{domainname}.csv'
-    date_today = datetime.date.today().strftime("%Y-%m-%d")
+    query_url = f"http://web.archive.org/cdx/search/cdx?url={domain}/&matchType=prefix&fl=timestamp,original&collapse=urlkey"
+    
+    headers = {
+        'Referer': 'https://web.archive.org/',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    }
 
-    query_url = f"http://web.archive.org/cdx/search/cdx?url={domain}/&matchType=prefix&fl=timestamp,original"
-    filter = "&collapse=urlkey"
-    query_url = query_url + filter
-
-    headers = {'Referer': 'https://web.archive.org/',
-               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-                             'Chrome/92.0.4515.107 Safari/537.36'}
-
-    async with aiohttp.ClientSession(connector=None) as session:
+    async with aiohttp.ClientSession() as session:
         try:
-            resp = await session.get(query_url, headers=headers, timeout=300000)
-            count = 0
-            while True:
-                raw = await resp.content.read(10240)
-                if not raw:
-                    break
-                try:
-                    raw = raw.decode('utf-8')
-                except UnicodeDecodeError:
-                    raw = raw.decode('latin-1')
-
+            async with session.get(query_url, headers=headers) as resp:
                 if resp.status != 200:
-                    print('not 200')
-                lines = raw.splitlines()
-                fieldnames = ['date', 'url']
-                count += len(lines)
-                file_exists = os.path.isfile(csv_file)
+                    print(f"✗ Wayback Machine API returned status {resp.status}")
+                    return
 
+                content = await resp.text()
+                lines = content.splitlines()
+                
+                fieldnames = ['date', 'url']
+                os.makedirs('./result', exist_ok=True)
+                
+                print(f"\nProcessing {len(lines)} URLs...")
                 for line in lines:
                     if ' ' in line:
                         data = {'url': line.strip()}
-                        with open(csv_file, mode='a', newline='', encoding='utf-8') as f:
-                            writer = csv.DictWriter(f, fieldnames=fieldnames)
-                            writer.writerow(data)
-                        # Write to Cloudflare D1 table
-                        await write_to_cloudflare_d1(data)
+                        # Write to CSV
+                        # with open(csv_file, mode='a', newline='', encoding='utf-8') as f:
+                            # writer = csv.DictWriter(f, fieldnames=fieldnames)
+                            # writer.writerow(data)
+                        # Write to Cloudflare D1
+                        await write_to_cloudflare_d1(session, data, api_token, account_id, database_id)
 
-            print('============', count)
+                print(f"\n✓ Processed {len(lines)} URLs")
 
-        except aiohttp.ClientError as e:
-            print(f"Connection error: {e}", 'red')
         except Exception as e:
-            print(f"Couldn't get list of responses: {e}", 'red')
+            print(f"✗ Error: {str(e)}")
 
-async def write_to_cloudflare_d1(data):
-    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/databases/{database_id}/query"
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {api_token}"
-    }
-    payload = {
-        "query": "INSERT INTO wayback_data (url) VALUES ($1)",
-        "params": [data['url']]
-    }
-    async with aiohttp.ClientSession() as session:
-        async with session.post(url, headers=headers, json=payload) as response:
-            if response.status == 200:
-                print(f"Successfully inserted data: {data}")
-            else:
-                print(f"Failed to insert data: {await response.text()}")
+async def main():
+    # Check environment variables
+    env_vars = check_environment_variables()
+    
+    # Test Cloudflare connection
+    if not await test_cloudflare_connection(
+        env_vars['CLOUDFLARE_API_TOKEN'],
+        env_vars['CLOUDFLARE_ACCOUNT_ID'],
+        env_vars['CLOUDFLARE_D1_DATABASE_ID']
+    ):
+        sys.exit(1)
 
-# Create the table in Cloudflare D1
-def create_table_in_cloudflare_d1():
-    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/databases/{database_id}/query"
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {api_token}"
-    }
-    payload = {
-        "query": """
-        CREATE TABLE IF NOT EXISTS wayback_data (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            url TEXT NOT NULL,
-            timestamp TEXT NOT NULL
-        )
-        """
-    }
-    response = requests.post(url, headers=headers, json=payload)
-    if response.status_code == 200:
-        print("Table 'wayback_data' created successfully.")
-    else:
-        print(f"Failed to create table: {response.text}")
+    # Process URLs
+    await geturls(
+        env_vars['DOMAIN'],
+        env_vars['CLOUDFLARE_API_TOKEN'],
+        env_vars['CLOUDFLARE_ACCOUNT_ID'],
+        env_vars['CLOUDFLARE_D1_DATABASE_ID']
+    )
 
-# create_table_in_cloudflare_d1()
-asyncio.run(geturls(domain))
+if __name__ == "__main__":
+    asyncio.run(main())
