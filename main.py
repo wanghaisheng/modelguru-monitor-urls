@@ -7,22 +7,18 @@ from dotenv import load_dotenv
 import sys
 
 load_dotenv()
+
+# Global configuration
 filters = ['30_days', '7_days', '1_day', '1_year', '6_months', '3_months']
+print(f"Script started by {os.getenv('GITHUB_ACTOR', 'local user')} at {datetime.datetime.utcnow().isoformat()}")
 
 def get_time_range(filter_option):
     """
     Calculate start and end timestamps for Wayback Machine API based on filter option.
     Returns timestamps in YYYYMMDDHHMMSS format.
-    
-    Args:
-        filter_option (str): One of '30_days', '7_days', '1_day'
-    
-    Returns:
-        tuple: (start_timestamp, end_timestamp)
     """
-    now = datetime.datetime.utcnow()  # Use UTC time
+    now = datetime.datetime.utcnow()
     
-    # Define the time ranges
     time_ranges = {
         '30_days': 30,
         '7_days': 7,
@@ -35,31 +31,23 @@ def get_time_range(filter_option):
     if filter_option not in time_ranges:
         raise ValueError(f"Invalid filter. Choose from: {', '.join(time_ranges.keys())}")
     
-    # Calculate start date
     start = (now - datetime.timedelta(days=time_ranges[filter_option]))
     end = now
 
-    # Format timestamps in YYYYMMDDHHMMSS format
     start_timestamp = start.strftime("%Y%m%d%H%M%S")
     end_timestamp = end.strftime("%Y%m%d%H%M%S")
 
     print(f"Date range: {start.isoformat()} to {end.isoformat()} UTC")
     return start_timestamp, end_timestamp
 
-# Example usage:
-    # Test the function with different filters
-    
-
 def check_environment_variables():
     """Check and validate required environment variables"""
-    
     required_vars = {
-
         'DOMAIN': os.getenv('domain', 'https://www.amazon.com/sp?ie=UTF8&seller='),
         'CLOUDFLARE_API_TOKEN': os.getenv('CLOUDFLARE_API_TOKEN'),
         'CLOUDFLARE_ACCOUNT_ID': os.getenv('CLOUDFLARE_ACCOUNT_ID'),
-        'CLOUDFLARE_D1_DATABASE_ID': os.getenv('CLOUDFLARE_D1_DATABASE_ID')
-        'timeframe':os.getenv('TIME_FRAME',2)
+        'CLOUDFLARE_D1_DATABASE_ID': os.getenv('CLOUDFLARE_D1_DATABASE_ID'),
+        'TIME_FRAME': os.getenv('TIME_FRAME', '2')
     }
 
     missing_vars = [var for var, value in required_vars.items() if not value]
@@ -68,15 +56,40 @@ def check_environment_variables():
         print(f"Error: Missing required environment variables: {', '.join(missing_vars)}")
         print("\nCurrent environment variables:")
         for var, value in required_vars.items():
-            masked_value = '***' if value and var != 'DOMAIN' else value
+            masked_value = '***' if value and var not in ['DOMAIN', 'TIME_FRAME'] else value
             print(f"{var}: {masked_value}")
         sys.exit(1)
 
     return required_vars
 
+async def check_url_exists(session, url, api_token, account_id, database_id):
+    """Check if URL already exists in the table"""
+    check_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/database/{database_id}/query"
+    
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_token}"
+    }
+    
+    payload = {
+        "sql": "SELECT COUNT(*) as count FROM wayback_data WHERE url = ?",
+        "params": [url]
+    }
+
+    try:
+        async with session.post(check_url, headers=headers, json=payload) as response:
+            if response.status == 200:
+                data = await response.json()
+                if data.get('success') and data.get('result'):
+                    count = data['result'][0]['count']
+                    return count > 0
+            return False
+    except Exception as e:
+        print(f"✗ Error checking URL existence: {str(e)}")
+        return False
+
 async def test_cloudflare_connection(api_token, account_id, database_id):
     """Test connection to Cloudflare API"""
-    # Updated URL format for D1
     url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/database/{database_id}"
     
     headers = {
@@ -111,6 +124,12 @@ async def test_cloudflare_connection(api_token, account_id, database_id):
 
 async def write_to_cloudflare_d1(session, data, api_token, account_id, database_id):
     """Write data to Cloudflare D1"""
+    url_exists = await check_url_exists(session, data['url'], api_token, account_id, database_id)
+    
+    if url_exists:
+        print(f"⚠ URL already exists, skipping: {data['url']}")
+        return
+
     url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/database/{database_id}/query"
     
     headers = {
@@ -121,8 +140,8 @@ async def write_to_cloudflare_d1(session, data, api_token, account_id, database_
     current_time = datetime.datetime.utcnow().isoformat()
     
     payload = {
-        "sql": "INSERT INTO wayback_data (url, timestamp) VALUES (?, ?)",
-        "params": [data['url'],data ['date'],current_time]
+        "sql": "INSERT INTO wayback_data (url, date, updateAt) VALUES (?, ?, ?)",
+        "params": [data['url'], data['date'], current_time]
     }
 
     try:
@@ -136,18 +155,24 @@ async def write_to_cloudflare_d1(session, data, api_token, account_id, database_
     except Exception as e:
         print(f"✗ Error writing to Cloudflare: {str(e)}")
 
-async def geturls(domain, api_token, account_id, database_id):
+async def geturls(domain, api_token, account_id, database_id, timeframe):
     """Fetch URLs from Wayback Machine and store them"""
     domainname = domain.replace("https://", "").split('/')[0]
-    csv_file = f'waybackmachines-{domainname}.csv'
     query_url = f"http://web.archive.org/cdx/search/cdx?url={domain}/&matchType=prefix&fl=timestamp,original&collapse=urlkey"
-    start, end = get_time_range(filters[timeframe])
+    
+    try:
+        timeframe_index = int(timeframe)
+        if timeframe_index < 0 or timeframe_index >= len(filters):
+            print(f"⚠ Invalid timeframe index {timeframe_index}, using default (2)")
+            timeframe_index = 2
+    except ValueError:
+        print("⚠ Invalid timeframe value, using default (2)")
+        timeframe_index = 2
 
-    if not end: 
-        filter=f'&statuscode=200&from={start}'
-    else:
-        filter=f'&statuscode=200&from={start}&to={end}'
-    query_url=query_url+filter
+    start, end = get_time_range(filters[timeframe_index])
+
+    filter_str = f'&statuscode=200&from={start}&to={end}'
+    query_url = query_url + filter_str
 
     headers = {
         'Referer': 'https://web.archive.org/',
@@ -167,19 +192,28 @@ async def geturls(domain, api_token, account_id, database_id):
                 os.makedirs('./result', exist_ok=True)
                 
                 print(f"\nProcessing {len(lines)} URLs...")
+                total_processed = 0
+                total_skipped = 0
+
                 for line in lines:
                     if ' ' in line:
-                        url=line.strip().split(' ')[1]
-                        date=line.strip().split(' ')[1]
-                        data={
-                            "url":url,
-                            "date":date
-                        }
-                        # Write to CSV
-                        # Write to Cloudflare D1
-                        await write_to_cloudflare_d1(session, data, api_token, account_id, database_id)
+                        parts = line.strip().split(' ')
+                        if len(parts) >= 2:
+                            data = {
+                                "url": parts[1],
+                                "date": parts[0]
+                            }
+                            url_exists = await check_url_exists(session, data['url'], api_token, account_id, database_id)
+                            if url_exists:
+                                total_skipped += 1
+                            else:
+                                await write_to_cloudflare_d1(session, data, api_token, account_id, database_id)
+                                total_processed += 1
 
-                print(f"\n✓ Processed {len(lines)} URLs")
+                print(f"\n✓ Processing complete:")
+                print(f"  - Total URLs found: {len(lines)}")
+                print(f"  - URLs processed: {total_processed}")
+                print(f"  - URLs skipped (already exist): {total_skipped}")
 
         except Exception as e:
             print(f"✗ Error: {str(e)}")
@@ -197,9 +231,8 @@ async def create_table(api_token, account_id, database_id):
         "sql": """
         CREATE TABLE IF NOT EXISTS wayback_data (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            url TEXT NOT NULL,
+            url TEXT NOT NULL UNIQUE,
             date TEXT NOT NULL,
-
             updateAt TEXT NOT NULL
         )
         """
@@ -243,7 +276,8 @@ async def main():
         env_vars['DOMAIN'],
         env_vars['CLOUDFLARE_API_TOKEN'],
         env_vars['CLOUDFLARE_ACCOUNT_ID'],
-        env_vars['CLOUDFLARE_D1_DATABASE_ID']
+        env_vars['CLOUDFLARE_D1_DATABASE_ID'],
+        env_vars['TIME_FRAME']
     )
 
 if __name__ == "__main__":
