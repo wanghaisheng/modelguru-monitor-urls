@@ -4,9 +4,9 @@ on:
   workflow_dispatch:  # This allows manual trigger from the GitHub UI.
     inputs:
         domain:
-        description: 'domain url'
-        required: false
-        type: string
+          description: 'domain url'
+          required: false
+          type: string
 
 jobs:
   google_search:
