@@ -3,10 +3,8 @@ import csv
 import os
 import asyncio
 import datetime
-import json
-import cloudflare
 from dotenv import load_dotenv
-from cloudflare import Cloudflare
+import requests
 
 load_dotenv()
 
@@ -14,6 +12,7 @@ load_dotenv()
 domain = os.getenv('domain')
 if domain is None:
     domain = 'https://www.amazon.com/sp'
+proxy_url = os.getenv('proxy_url')
 api_token = os.getenv('CLOUDFLARE_API_TOKEN')
 account_id = os.getenv('CLOUDFLARE_ACCOUNT_ID')
 database_id = os.getenv('CLOUDFLARE_D1_DATABASE_ID')
@@ -59,9 +58,9 @@ async def geturls(domain):
                 for line in lines:
                     if ' ' in line:
                         data = {'url': line.strip()}
-                        # with open(csv_file, mode='a', newline='', encoding='utf-8') as f:
-                            # writer = csv.DictWriter(f, fieldnames=fieldnames)
-                            # writer.writerow(data)
+                        with open(csv_file, mode='a', newline='', encoding='utf-8') as f:
+                            writer = csv.DictWriter(f, fieldnames=fieldnames)
+                            writer.writerow(data)
                         # Write to Cloudflare D1 table
                         await write_to_cloudflare_d1(data)
 
@@ -73,21 +72,43 @@ async def geturls(domain):
             print(f"Couldn't get list of responses: {e}", 'red')
 
 async def write_to_cloudflare_d1(data):
-    cf = Cloudflare(api_token)
-    try:
-        response = cf.accounts.dns_records.post(
-            account_id,
-            database_id,
-            json={
-                "query": "INSERT INTO wayback_data (url) VALUES ($1)",
-                "params": [data['url']]
-            }
-        )
-        if response.status_code == 200:
-            print(f"Successfully inserted data: {data}")
-        else:
-            print(f"Failed to insert data: {response.content}")
-    except Exception as e:
-        print(f"Error writing to Cloudflare D1: {e}")
+    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/databases/{database_id}/query"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_token}"
+    }
+    payload = {
+        "query": "INSERT INTO wayback_data (url) VALUES ($1)",
+        "params": [data['url']]
+    }
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, headers=headers, json=payload) as response:
+            if response.status == 200:
+                print(f"Successfully inserted data: {data}")
+            else:
+                print(f"Failed to insert data: {await response.text()}")
 
+# Create the table in Cloudflare D1
+def create_table_in_cloudflare_d1():
+    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/databases/{database_id}/query"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_token}"
+    }
+    payload = {
+        "query": """
+        CREATE TABLE IF NOT EXISTS wayback_data (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            url TEXT NOT NULL,
+            timestamp TEXT NOT NULL
+        )
+        """
+    }
+    response = requests.post(url, headers=headers, json=payload)
+    if response.status_code == 200:
+        print("Table 'wayback_data' created successfully.")
+    else:
+        print(f"Failed to create table: {response.text()}")
+
+create_table_in_cloudflare_d1()
 asyncio.run(geturls(domain))
