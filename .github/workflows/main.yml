@@ -34,11 +34,11 @@ jobs:
       run: |
         python main.py
 
-    - name: Commit the results to the repository if there's a change
-      run: |
-        git config --global user.name "GitHub Action"
-        git config --global user.email "action@github.com"
+    # - name: Commit the results to the repository if there's a change
+      # run: |
+        # git config --global user.name "GitHub Action"
+        # git config --global user.email "action@github.com"
       
-        git add -A
-        git commit -m "Add new Google search results"
-        git push
+        # git add -A
+        # git commit -m "Add new Google search results"
+        # git push
