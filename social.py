@@ -287,7 +287,7 @@ async def main():
 # hashtag = "exampleHashtag"  # Replace with your actual hashtag
 
 # Define the list of links for the given hashtag
-links = [
+    links = [
     {"Facebook": f"https://www.facebook.com/hashtag/"},
     {"Instagram": f"https://www.instagram.com/explore/tags/"},
     {"Vkontakte": f"https://vk.com/search?c%5Bq%5D=%23"},
