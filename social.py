@@ -63,7 +63,7 @@ def check_environment_variables():
 
     return required_vars
 
-async def check_url_exists(session, url, api_token, account_id, database_id):
+async def check_url_exists(platform,session, url, api_token, account_id, database_id):
     """Check if URL already exists in the table"""
     check_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/database/{database_id}/query"
     
@@ -73,7 +73,7 @@ async def check_url_exists(session, url, api_token, account_id, database_id):
     }
     
     payload = {
-        "sql": "SELECT COUNT(*) as count FROM wayback_tiktok_hashtag_data WHERE url = ?",
+        "sql": f"SELECT COUNT(*) as count FROM wayback_{platform}_hashtag_data WHERE url = ?",
         "params": [url]
     }
 
@@ -123,7 +123,7 @@ async def test_cloudflare_connection(api_token, account_id, database_id):
         print(f"✗ Connection error: {str(e)}")
         return False
 
-async def write_to_cloudflare_d1(session, data, api_token, account_id, database_id):
+async def write_to_cloudflare_d1(platform,session, data, api_token, account_id, database_id):
     """Write data to Cloudflare D1"""
     url_exists = await check_url_exists(session, data['url'], api_token, account_id, database_id)
     
@@ -141,7 +141,7 @@ async def write_to_cloudflare_d1(session, data, api_token, account_id, database_
     current_time = datetime.datetime.utcnow().isoformat()
     
     payload = {
-        "sql": "INSERT INTO wayback_tiktok_hashtag_data (url, date, updateAt) VALUES (?, ?, ?)",
+        "sql": f"INSERT INTO wayback_{platform}_hashtag_data (url, date, updateAt) VALUES (?, ?, ?)",
         "params": [data['url'], data['date'], current_time]
     }
 
@@ -214,7 +214,7 @@ async def geturls(domain, api_token, account_id, database_id, timeframe):
                                 "url": url,
                                 "date": parts[0]
                             }
-                            await write_to_cloudflare_d1(session, data, api_token, account_id, database_id)
+                            await write_to_cloudflare_d1(platform,session, data, api_token, account_id, database_id)
                             
                             # url_exists = await check_url_exists(session, data['url'], api_token, account_id, database_id)
                             # if url_exists:
@@ -231,7 +231,7 @@ async def geturls(domain, api_token, account_id, database_id, timeframe):
         except Exception as e:
             print(f"✗ Error: {str(e)}")
 
-async def create_table(api_token, account_id, database_id):
+async def create_table(platform,api_token, account_id, database_id):
     """Create the wayback_data table if it doesn't exist"""
     url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/database/{database_id}/query"
     
@@ -241,8 +241,8 @@ async def create_table(api_token, account_id, database_id):
     }
     
     payload = {
-        "sql": """
-        CREATE TABLE IF NOT EXISTS wayback_tiktok_hashtag_data (
+        "sql": f"""
+        CREATE TABLE IF NOT EXISTS wayback_{platform}_hashtag_data (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             url TEXT NOT NULL UNIQUE,
             date TEXT NOT NULL,
@@ -277,12 +277,6 @@ async def main():
     ):
         sys.exit(1)
 
-    # Create table
-    await create_table(
-        env_vars['CLOUDFLARE_API_TOKEN'],
-        env_vars['CLOUDFLARE_ACCOUNT_ID'],
-        env_vars['CLOUDFLARE_D1_DATABASE_ID']
-    )
 
 
 # hashtag = "exampleHashtag"  # Replace with your actual hashtag
@@ -342,13 +336,18 @@ async def main():
 ]
 
 # Print all links
-    for link in links:
+    for link in links[:1]:
         for platform, url in link.items():
-          print(f"{platform}: {url}")
+            print(f"{platform}: {url}")
+            platform=platform.lower()
+            await create_table(platform,
+        env_vars['CLOUDFLARE_API_TOKEN'],
+        env_vars['CLOUDFLARE_ACCOUNT_ID'],
+        env_vars['CLOUDFLARE_D1_DATABASE_ID']
+    )
 
-  
     # Process URLs
-        await geturls(
+            await geturls(
         # env_vars['DOMAIN'],
           url,
         env_vars['CLOUDFLARE_API_TOKEN'],
