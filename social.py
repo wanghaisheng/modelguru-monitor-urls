@@ -76,7 +76,8 @@ async def check_url_exists(platform,session, url, api_token, account_id, databas
         "sql": f"SELECT COUNT(*) as count FROM wayback_{platform}_hashtag_data WHERE url = ?",
         "params": [url]
     }
-
+    print('check existing sql',  f"SELECT COUNT(*) as count FROM wayback_{platform}_hashtag_data WHERE url = ?"
+)
     try:
         async with session.post(check_url, headers=headers, json=payload) as response:
             if response.status == 200:
@@ -335,9 +336,11 @@ async def main():
 # Print all links
     for link in links:
         for platform, url in link.items():
-            print(f"{platform}: {url}")
             platform=platform.lower()
+            
             domain=os.getenv('domain','reddit').lower()
+            print('domain you input is',domain)
+            print(f"current {platform}: {url}")
             
             if platform!=domain:
                 continue
