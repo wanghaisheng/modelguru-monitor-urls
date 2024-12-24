@@ -331,7 +331,8 @@ async def main():
     {"Meipai": f"https://www.meipai.com/search/all?q=%23"},
     {"Gofundme": f"https://www.gofundme.com/s?q=%23"},
     {"Dribbble": f"https://dribbble.com/search/#"},
-  {"xhs":"https://www.xiaohongshu.com/search_result/?keyword="}
+  {"xhs":"https://www.xiaohongshu.com/search_result/?keyword="},
+        {'ideogram':"https://ideogram.ai/assets/progressive-image/balanced/response/"}
     # Add other links as needed
 ]
 
