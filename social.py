@@ -332,13 +332,13 @@ async def main():
         {'ideogram':"https://ideogram.ai/assets/progressive-image/balanced/response/"}
     # Add other links as needed
 ]
+domain=env_vars['DOMAIN'].lower()
 
 # Print all links
     for link in links:
         for platform, url in link.items():
             platform=platform.lower()
             
-            domain=env_vars['DOMAIN'].lower()
             print('domain you input is',domain)
             print(f"current {platform}: {url}")
             
