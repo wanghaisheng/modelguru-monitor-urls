@@ -205,7 +205,7 @@ async def geturls(domain, api_token, account_id, database_id, timeframe):
                                 if '&' in url:
                                     url=url.split('&')[0]
                             data = {
-                                "url": parts[1],
+                                "url": url,
                                 "date": parts[0]
                             }
                             await write_to_cloudflare_d1(session, data, api_token, account_id, database_id)
