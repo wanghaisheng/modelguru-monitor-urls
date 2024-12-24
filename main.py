@@ -72,7 +72,7 @@ async def check_url_exists(session, url, api_token, account_id, database_id):
     }
     
     payload = {
-        "sql": "SELECT COUNT(*) as count FROM wayback_data WHERE url = ?",
+        "sql": "SELECT COUNT(*) as count FROM wayback_sellerid_data WHERE url = ?",
         "params": [url]
     }
 
@@ -140,7 +140,7 @@ async def write_to_cloudflare_d1(session, data, api_token, account_id, database_
     current_time = datetime.datetime.utcnow().isoformat()
     
     payload = {
-        "sql": "INSERT INTO wayback_data (url, date, updateAt) VALUES (?, ?, ?)",
+        "sql": "INSERT INTO wayback_sellerid_data (url, date, updateAt) VALUES (?, ?, ?)",
         "params": [data['url'], data['date'], current_time]
     }
 
@@ -236,7 +236,7 @@ async def create_table(api_token, account_id, database_id):
     
     payload = {
         "sql": """
-        CREATE TABLE IF NOT EXISTS wayback_data (
+        CREATE TABLE IF NOT EXISTS wayback_sellerid_data (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             url TEXT NOT NULL UNIQUE,
             date TEXT NOT NULL,
