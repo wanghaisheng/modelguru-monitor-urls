@@ -1,4 +1,4 @@
-name: reddit hashtag from Wayback Machine
+name: reddit hashtag
 
 on:
   workflow_dispatch:
