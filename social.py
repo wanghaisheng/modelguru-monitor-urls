@@ -156,7 +156,7 @@ async def write_to_cloudflare_d1(platform,session, data, api_token, account_id, 
     except Exception as e:
         print(f"✗ Error writing to Cloudflare: {str(e)}")
 
-async def geturls(domain, api_token, account_id, database_id, timeframe):
+async def geturls(platform,domain, api_token, account_id, database_id, timeframe):
     """Fetch URLs from Wayback Machine and store them"""
     domainname = domain.replace("https://", "").split('/')[0]
     query_url = f"http://web.archive.org/cdx/search/cdx?url={domain}/&matchType=prefix&fl=timestamp,original&collapse=urlkey"
@@ -350,10 +350,11 @@ async def main():
     # Process URLs
             domain=os.getenv('domain','reddit').lower()
 
-            if platform==domain:
+            if platform!=domain:
                 continue
             await geturls(
         # env_vars['DOMAIN'],
+          platform,
           url,
         env_vars['CLOUDFLARE_API_TOKEN'],
         env_vars['CLOUDFLARE_ACCOUNT_ID'],
