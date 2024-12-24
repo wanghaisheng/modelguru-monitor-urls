@@ -44,7 +44,7 @@ def get_time_range(filter_option):
 def check_environment_variables():
     """Check and validate required environment variables"""
     required_vars = {
-        'DOMAIN': os.getenv('domain', 'https://www.tiktok.com/tag'),
+        'DOMAIN': os.getenv('domain', 'reddit'),
         'CLOUDFLARE_API_TOKEN': os.getenv('CLOUDFLARE_API_TOKEN'),
         'CLOUDFLARE_ACCOUNT_ID': os.getenv('CLOUDFLARE_ACCOUNT_ID'),
         'CLOUDFLARE_D1_DATABASE_ID': os.getenv('CLOUDFLARE_D1_DATABASE_ID'),
@@ -338,7 +338,7 @@ async def main():
         for platform, url in link.items():
             platform=platform.lower()
             
-            domain=os.getenv('domain','reddit').lower()
+            domain=env_vars['DOMAIN'].lower()
             print('domain you input is',domain)
             print(f"current {platform}: {url}")
             
