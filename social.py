@@ -347,7 +347,9 @@ async def main():
     )
 
     # Process URLs
-            if platform=='reddit':
+            domain=os.getenv('domain','reddit').lower()
+
+            if platform==domain:
                 continue
             await geturls(
         # env_vars['DOMAIN'],
