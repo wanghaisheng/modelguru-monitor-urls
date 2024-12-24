@@ -5,8 +5,16 @@ import asyncio
 import datetime
 from dotenv import load_dotenv
 import sys
+from DataRecorder import Recorder
 
 load_dotenv()
+os.makedirs("./result", exist_ok=True)
+
+
+local=os.getenv('localsave',False)
+if local:
+    
+    outfile=Recorder(f'./result/{date_today}.csv')
 
 # Global configuration
 filters = ['30_days', '7_days', '1_day', '1_year', '6_months', '3_months']
@@ -215,7 +223,8 @@ async def geturls(domain, api_token, account_id, database_id, timeframe):
                                 "date": parts[0]
                             }
                             await write_to_cloudflare_d1(platform,session, data, api_token, account_id, database_id)
-                            
+                            if local:
+                                outfile.add_data(data)
                             # url_exists = await check_url_exists(session, data['url'], api_token, account_id, database_id)
                             # if url_exists:
                                 # total_skipped += 1
@@ -355,6 +364,7 @@ async def main():
         env_vars['CLOUDFLARE_D1_DATABASE_ID'],
         env_vars['TIME_FRAME']
     )
-
+    if local:
+        outfile.record()
 if __name__ == "__main__":
     asyncio.run(main())
