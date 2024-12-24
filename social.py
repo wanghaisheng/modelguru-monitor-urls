@@ -44,7 +44,7 @@ def get_time_range(filter_option):
 def check_environment_variables():
     """Check and validate required environment variables"""
     required_vars = {
-        'DOMAIN': os.getenv('domain', 'reddit'),
+        'DOMAIN': os.getenv('DOMAIN', 'reddit'),
         'CLOUDFLARE_API_TOKEN': os.getenv('CLOUDFLARE_API_TOKEN'),
         'CLOUDFLARE_ACCOUNT_ID': os.getenv('CLOUDFLARE_ACCOUNT_ID'),
         'CLOUDFLARE_D1_DATABASE_ID': os.getenv('CLOUDFLARE_D1_DATABASE_ID'),
