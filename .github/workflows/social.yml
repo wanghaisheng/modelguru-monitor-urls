@@ -1,4 +1,4 @@
-name: tk hashtag from Wayback Machine
+name: social hashtag from Wayback Machine
 
 on:
   workflow_dispatch:
@@ -36,7 +36,7 @@ jobs:
         CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         CLOUDFLARE_D1_DATABASE_ID: ${{ secrets.CLOUDFLARE_D1_DATABASE_ID }}
       run: |
-        python tk.py
+        python social.py
 
     # - name: Commit the results to the repository if there's a change
       # run: |
