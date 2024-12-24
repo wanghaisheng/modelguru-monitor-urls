@@ -20,9 +20,10 @@ def get_time_range(filter_option):
     now = datetime.datetime.utcnow()
     
     time_ranges = {
-        '30_days': 30,
         '7_days': 7,
         '1_day': 1,
+        '30_days': 30,
+
         '1_year': 365,
         '6_months': 180,
         '3_months': 90
@@ -47,7 +48,7 @@ def check_environment_variables():
         'CLOUDFLARE_API_TOKEN': os.getenv('CLOUDFLARE_API_TOKEN'),
         'CLOUDFLARE_ACCOUNT_ID': os.getenv('CLOUDFLARE_ACCOUNT_ID'),
         'CLOUDFLARE_D1_DATABASE_ID': os.getenv('CLOUDFLARE_D1_DATABASE_ID'),
-        'TIME_FRAME': os.getenv('time_frame', '2')
+        'TIME_FRAME': os.getenv('time_frame', '0')
     }
 
     missing_vars = [var for var, value in required_vars.items() if not value]
