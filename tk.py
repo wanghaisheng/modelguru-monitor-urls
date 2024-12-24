@@ -43,11 +43,11 @@ def get_time_range(filter_option):
 def check_environment_variables():
     """Check and validate required environment variables"""
     required_vars = {
-        'DOMAIN': os.getenv('domain', 'https://www.tiktok.com/hashtag'),
+        'DOMAIN': os.getenv('domain', 'https://www.tiktok.com/tag'),
         'CLOUDFLARE_API_TOKEN': os.getenv('CLOUDFLARE_API_TOKEN'),
         'CLOUDFLARE_ACCOUNT_ID': os.getenv('CLOUDFLARE_ACCOUNT_ID'),
         'CLOUDFLARE_D1_DATABASE_ID': os.getenv('CLOUDFLARE_D1_DATABASE_ID'),
-        'TIME_FRAME': os.getenv('time_frame', '0')
+        'TIME_FRAME': os.getenv('time_frame', '2')
     }
 
     missing_vars = [var for var, value in required_vars.items() if not value]
@@ -173,6 +173,7 @@ async def geturls(domain, api_token, account_id, database_id, timeframe):
 
     filter_str = f'&statuscode=200&from={start}&to={end}'
     query_url = query_url + filter_str
+    print('start,end',start,end)
 
     headers = {
         'Referer': 'https://web.archive.org/',
