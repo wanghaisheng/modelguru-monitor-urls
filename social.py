@@ -336,7 +336,7 @@ async def main():
 ]
 
 # Print all links
-    for link in links[:1]:
+    for link in links:
         for platform, url in link.items():
             print(f"{platform}: {url}")
             platform=platform.lower()
