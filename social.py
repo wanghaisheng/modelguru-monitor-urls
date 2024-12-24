@@ -125,7 +125,7 @@ async def test_cloudflare_connection(api_token, account_id, database_id):
 
 async def write_to_cloudflare_d1(platform,session, data, api_token, account_id, database_id):
     """Write data to Cloudflare D1"""
-    url_exists = await check_url_exists(session, data['url'], api_token, account_id, database_id)
+    url_exists = await check_url_exists(platform,session, data['url'], api_token, account_id, database_id)
     
     if url_exists:
         print(f"⚠ URL already exists, skipping: {data['url']}")
@@ -212,7 +212,7 @@ async def geturls(platform,domain, api_token, account_id, database_id, timeframe
                             }
                             await write_to_cloudflare_d1(platform,session, data, api_token, account_id, database_id)
                             
-                            # url_exists = await check_url_exists(session, data['url'], api_token, account_id, database_id)
+                            # url_exists = await check_url_exists(platform,session, data['url'], api_token, account_id, database_id)
                             # if url_exists:
                                 # total_skipped += 1
                             # else:
@@ -337,6 +337,11 @@ async def main():
         for platform, url in link.items():
             print(f"{platform}: {url}")
             platform=platform.lower()
+            domain=os.getenv('domain','reddit').lower()
+            
+            if platform!=domain:
+                continue
+            
             await create_table(platform,
         env_vars['CLOUDFLARE_API_TOKEN'],
         env_vars['CLOUDFLARE_ACCOUNT_ID'],
@@ -344,10 +349,7 @@ async def main():
     )
 
     # Process URLs
-            domain=os.getenv('domain','reddit').lower()
 
-            if platform!=domain:
-                continue
             await geturls(
         # env_vars['DOMAIN'],
           platform,
