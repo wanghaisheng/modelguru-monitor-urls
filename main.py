@@ -199,16 +199,23 @@ async def geturls(domain, api_token, account_id, database_id, timeframe):
                     if ' ' in line:
                         parts = line.strip().split(' ')
                         if len(parts) >= 2:
+                            url=parts[1]
+                            if '&seller=' in url:
+                                url=url.split('&seller=')[-1]
+                                if '&' in url:
+                                    url=url.split('&')[0]
                             data = {
                                 "url": parts[1],
                                 "date": parts[0]
                             }
-                            url_exists = await check_url_exists(session, data['url'], api_token, account_id, database_id)
-                            if url_exists:
-                                total_skipped += 1
-                            else:
-                                await write_to_cloudflare_d1(session, data, api_token, account_id, database_id)
-                                total_processed += 1
+                            await write_to_cloudflare_d1(session, data, api_token, account_id, database_id)
+                            
+                            # url_exists = await check_url_exists(session, data['url'], api_token, account_id, database_id)
+                            # if url_exists:
+                                # total_skipped += 1
+                            # else:
+                                # await write_to_cloudflare_d1(session, data, api_token, account_id, database_id)
+                                # total_processed += 1
 
                 print(f"\n✓ Processing complete:")
                 print(f"  - Total URLs found: {len(lines)}")
