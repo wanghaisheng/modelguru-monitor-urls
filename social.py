@@ -280,7 +280,6 @@ async def main():
 
 # Define the list of links for the given hashtag
     links = [
-    {"crazygames","https://crazygames.com/"},
     {"Facebook": f"https://www.facebook.com/hashtag/"},
     {"Instagram": f"https://www.instagram.com/explore/tags/"},
     {"Vkontakte": f"https://vk.com/search?c%5Bq%5D=%23"},
@@ -330,10 +329,11 @@ async def main():
     {"Gofundme": f"https://www.gofundme.com/s?q=%23"},
     {"Dribbble": f"https://dribbble.com/search/#"},
   {"xhs":"https://www.xiaohongshu.com/search_result/?keyword="},
-        {'ideogram':"https://ideogram.ai/assets/progressive-image/balanced/response/"}
+        {'ideogram':"https://ideogram.ai/assets/progressive-image/balanced/response/"},
+        {'crazygames':"https://crazygames.com/"}
     # Add other links as needed
 ]
-    domain=env_vars['DOMAIN'].lower()
+domain=env_vars['DOMAIN'].lower()
 
 # Print all links
     for link in links:
@@ -352,7 +352,6 @@ async def main():
         env_vars['CLOUDFLARE_D1_DATABASE_ID']
     )
 
-    # Process URLs
 
             await geturls(
         # env_vars['DOMAIN'],
