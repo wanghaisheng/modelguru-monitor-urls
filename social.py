@@ -333,7 +333,7 @@ async def main():
         {'crazygames':"https://crazygames.com/"}
     # Add other links as needed
 ]
-domain=env_vars['DOMAIN'].lower()
+    domain=env_vars['DOMAIN'].lower()
 
 # Print all links
     for link in links:
