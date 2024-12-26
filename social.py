@@ -184,12 +184,12 @@ async def geturls_py(platform, domain, api_token, account_id, database_id, timef
         cdx_api = WaybackMachineCDXServerAPI(url=domainname,start_timestamp=start[:7], end_timestamp=end[:7])
         # Fetch snapshots between the specified time range
 
-        snapshots = cdx_api.snapshots()
+        urls = cdx_api.known_urls()
 
         # print(f"\nProcessing {len(snapshots)} URLs...")
 
         async with aiohttp.ClientSession() as session:
-            for snapshot in snapshots:
+            for snapshot in urls:
                 data = {
                     "url": snapshot.archive_url,
                     "date": snapshot.timestamp
