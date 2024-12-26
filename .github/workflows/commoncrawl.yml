@@ -7,10 +7,12 @@ on:
         description: 'domain url'
         required: false
         type: string
+        default: 'titkok'
       time_frame:
         description: "30_days,7_days,1_day,1_year,6_months,3_months"
         required: false
         type: string
+        default: "3"
 jobs:
   google_search:
     runs-on: ubuntu-latest
