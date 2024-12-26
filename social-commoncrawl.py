@@ -319,9 +319,11 @@ async def main():
     print('===',supportedplatforms)
     if domain not in supportedplatforms:
         print(f"Domain {domain} not in the list of supported platforms")
-        sys.exit(1)
+        # sys.exit(1)
 
-    platform_url = platforms.get(domain.capitalize())
+    platform_url = platforms.get(domain
+# .capitalize()
+                                )
 
     await create_table(
         domain,
