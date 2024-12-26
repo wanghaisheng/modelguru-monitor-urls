@@ -230,7 +230,7 @@ async def geturls(platform,domain, api_token, account_id, database_id, timeframe
         'Referer': 'https://web.archive.org/',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
     }
-    url = 'http://web.archive.org/cdx/search/cdx?url=https://www.' + website_url + '&collapse=digest&filter=!statuscode:404&showResumeKey=true&matchType=prefix&from=%s&to=%s&limit=%s&output=json'%(start,end,chunk_size)
+    url = 'http://web.archive.org/cdx/search/cdx?url=https://www.' + website_url + '*&collapse=digest&filter=!statuscode:404&showResumeKey=true&matchType=prefix&from=%s&to=%s&limit=%s&output=json'%(start,end,chunk_size)
 
     async with aiohttp.ClientSession() as session:
         try:
