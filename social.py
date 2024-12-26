@@ -222,11 +222,15 @@ async def geturls(platform,domain, api_token, account_id, database_id, timeframe
     filter_str = f'&statuscode=200&from={start}&to={end}'
     query_url = query_url + filter_str
     print('start,end',start,end)
+    chunk_size=4000
+    website_url=domain.replace('https://','')
+    website_url=website_url.replace('www.','')    
 
     headers = {
         'Referer': 'https://web.archive.org/',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
     }
+    url = 'http://web.archive.org/cdx/search/cdx?url=https://www.' + website_url + '&collapse=digest&filter=!statuscode:404&showResumeKey=true&matchType=prefix&from=%s&to=%s&limit=%s&output=json'%(start,end,chunk_size)
 
     async with aiohttp.ClientSession() as session:
         try:
@@ -250,7 +254,7 @@ async def geturls(platform,domain, api_token, account_id, database_id, timeframe
                         if len(parts) >= 2:
                             url=parts[1]
                             if domain in url:
-                                url=url.split(domain)[-1]
+                                url=url.split(website_url)[-1]
                                 if '&' in url:
                                     url=url.split('&')[0]
                             data = {
@@ -399,7 +403,7 @@ async def main():
     )
 
 
-            await geturls_py(
+            await geturls(
         # env_vars['DOMAIN'],
           platform,
           url,
