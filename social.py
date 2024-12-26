@@ -181,10 +181,10 @@ async def geturls_py(platform, domain, api_token, account_id, database_id, timef
 
     try:
         # Initialize Wayback Machine CDX Server API
-        cdx_api = WaybackMachineCDXServerAPI(url=domainname)
-
+        cdx_api = WaybackMachineCDXServerAPI(url=domainname,from_timestamp=start[:7], to_timestamp=end[:7])
         # Fetch snapshots between the specified time range
-        snapshots = cdx_api.snapshots(from_timestamp=start[:7], to_timestamp=end[:7])
+
+        snapshots = cdx_api.snapshots()
 
         print(f"\nProcessing {len(snapshots)} URLs...")
 
