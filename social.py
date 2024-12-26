@@ -186,13 +186,15 @@ async def geturls_py(platform, domain, api_token, account_id, database_id, timef
 
         snapshots = cdx_api.snapshots()
 
+        print(f"\nProcessing {len(snapshots)} URLs...")
 
-        for snapshot in snapshots:
-            data = {
-                    "url": snapshot.archive_url,
+        async with aiohttp.ClientSession() as session:
+            for snapshot in snapshots:
+                data = {
+                    "url": snapshot.url,
                     "date": snapshot.timestamp
                 }
-            await write_to_cloudflare_d1(platform, session, data, api_token, account_id, database_id)
+                await write_to_cloudflare_d1(platform, session, data, api_token, account_id, database_id)
 
         print(f"\n✓ Completed fetching and storing URLs for domain: {domainname}")
 
