@@ -324,6 +324,7 @@ async def main():
     platform_url = platforms.get(domain
 # .capitalize()
                                 )
+    print('=====',platform_url)
 
     await create_table(
         domain,
