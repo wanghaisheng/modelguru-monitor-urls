@@ -37,8 +37,8 @@ def get_time_range(filter_option):
     start = (now - datetime.timedelta(days=time_ranges[filter_option]))
     end = now
 
-    start_timestamp = start.strftime("%Y%m%d%H%M%S")
-    end_timestamp = end.strftime("%Y%m%d%H%M%S")
+    start_timestamp = start.strftime("%Y%m%d")
+    end_timestamp = end.strftime("%Y%m%d")
 
     print(f"Date range: {start.isoformat()} to {end.isoformat()} UTC")
     return start_timestamp, end_timestamp
