@@ -6,6 +6,7 @@ import datetime
 from dotenv import load_dotenv
 import sys
 from waybackpy import WaybackMachineCDXServerAPI
+from waybackpy.wrapper import Url
 
 load_dotenv()
 
@@ -181,7 +182,8 @@ async def geturls_py(platform, domain, api_token, account_id, database_id, timef
 
     try:
         # Initialize Wayback Machine CDX Server API
-        cdx_api = WaybackMachineCDXServerAPI(url=domainname,start_timestamp=start[:7], end_timestamp=end[:7])
+        # cdx_api = WaybackMachineCDXServerAPI(url=domainname,start_timestamp=start[:7], end_timestamp=end[:7])
+        cdx_api=Url(domainname)
         # Fetch snapshots between the specified time range
 
         urls = cdx_api.known_urls()
