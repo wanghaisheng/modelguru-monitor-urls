@@ -5,6 +5,7 @@ import asyncio
 import datetime
 from dotenv import load_dotenv
 import sys
+from waybackpy import WaybackMachineCDXServerAPI
 
 load_dotenv()
 
@@ -156,6 +157,49 @@ async def write_to_cloudflare_d1(platform,session, data, api_token, account_id, 
                 print(f"Error: {error_text}")
     except Exception as e:
         print(f"✗ Error writing to Cloudflare: {str(e)}")
+
+async def geturls_py(platform, domain, api_token, account_id, database_id, timeframe):
+    """
+    Fetch URLs from Wayback Machine using waybackpy and store them in the Cloudflare D1 database.
+    """
+    domainname = domain.replace("https://", "").split('/')[0]
+    print(f"\nFetching URLs for domain: {domainname}")
+
+    try:
+        timeframe_index = int(timeframe)
+        if timeframe_index < 0 or timeframe_index >= len(filters):
+            print(f"⚠ Invalid timeframe index {timeframe_index}, using default (2)")
+            timeframe_index = 2
+    except ValueError:
+        print("⚠ Invalid timeframe value, using default (2)")
+        timeframe_index = 2
+
+    start, end = get_time_range(filters[timeframe_index])
+
+    print(f"Timeframe: {filters[timeframe_index]}")
+    print(f"Start: {start}, End: {end}")
+
+    try:
+        # Initialize Wayback Machine CDX Server API
+        cdx_api = WaybackMachineCDXServerAPI(url=domainname)
+
+        # Fetch snapshots between the specified time range
+        snapshots = cdx_api.snapshots(from_timestamp=start[:7], to_timestamp=end[:7])
+
+        print(f"\nProcessing {len(snapshots)} URLs...")
+
+        async with aiohttp.ClientSession() as session:
+            for snapshot in snapshots:
+                data = {
+                    "url": snapshot.url,
+                    "date": snapshot.timestamp
+                }
+                await write_to_cloudflare_d1(platform, session, data, api_token, account_id, database_id)
+
+        print(f"\n✓ Completed fetching and storing URLs for domain: {domainname}")
+
+    except Exception as e:
+        print(f"✗ Error using waybackpy: {str(e)}")
 
 async def geturls(platform,domain, api_token, account_id, database_id, timeframe):
     """Fetch URLs from Wayback Machine and store them"""
@@ -353,7 +397,7 @@ async def main():
     )
 
 
-            await geturls(
+            await geturls_py(
         # env_vars['DOMAIN'],
           platform,
           url,
