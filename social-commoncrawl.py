@@ -310,7 +310,8 @@ async def main():
         "Dribbble": "https://dribbble.com/search/#",
         "xhs": "https://www.xiaohongshu.com/search_result/?keyword=",
         "ideogram": "https://ideogram.ai/assets/progressive-image/balanced/response/",
-        "crazygames": "https://crazygames.com/"
+        "crazygames": "https://crazygames.com/",
+        "tiktok":"https://tiktok.com/tag/"
     }
 
     # Check if the domain is in the list of platforms
