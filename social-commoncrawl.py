@@ -322,7 +322,7 @@ async def main():
         # sys.exit(1)
 
     platform_url = platforms.get(domain
-# .capitalize()
+.capitalize()
                                 )
     print('=====',platform_url)
 
