@@ -315,7 +315,9 @@ async def main():
     }
 
     # Check if the domain is in the list of platforms
-    if domain not in [platform.lower() for platform in platforms.keys()]:
+    supportedplatforms=    [platform.lower() for platform in platforms.keys()]
+    print('===',supportedplatforms)
+    if domain not in supportedplatforms:
         print(f"Domain {domain} not in the list of supported platforms")
         sys.exit(1)
 
