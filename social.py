@@ -267,7 +267,7 @@ async def geturls(platform,domain, api_token, account_id, database_id, timeframe
     query_url='http://web.archive.org/cdx/search/cdx?url=tiktok.com/tag/&collapse=urlkey&matchType=prefix&from=2023&to=2023'
     query_url='http://web.archive.org/cdx/search/cdx?url=tiktok.com/tag/&collapse=urlkey&matchType=prefix&from=2024&to=2024'
     query_url=query_url+'&fl=original,timestamp'
-    print('build query url',query_url)
+    print('build query url',query_url,website_url)
     async with aiohttp.ClientSession() as session:
         try:
             async with session.get(query_url, headers=headers,
@@ -288,13 +288,17 @@ async def geturls(platform,domain, api_token, account_id, database_id, timeframe
                 for line in lines:
                     if ' ' in line:
                         parts = line.strip().split(' ')
+                        print('preprocessing',parts)
                         
                         if len(parts) >= 2:
                             url=parts[1]
                             if website_url in url:
                                 url=url.split(website_url)[-1]
+                                print('keep params only',url)
                             if '&' in url:
                                 url=url.split('&')[0]
+                                print('keep params clean',url)
+                                
                             data = {
                                 "url": url,
                                 "date": parts[0]
@@ -419,8 +423,11 @@ async def main():
   {"xhs":"https://www.xiaohongshu.com/search_result/?keyword="},
         {'ideogram':"https://ideogram.ai/assets/progressive-image/balanced/response/"},
         {'crazygames':"https://crazygames.com/"}
-        # https://www.bbc.co.uk/bitesize/articles/zkw96rd
-    # Add other links as needed
+
+        
+        # https://mashable.com/article/very-demure-very-mindful-meaning-tiktok
+        # https://www.cosmopolitan.com/entertainment/celebs/a61865984/very-demure-tiktok-trend/
+        # Add other links as needed
 ]
     domain=env_vars['DOMAIN'].lower()
 
