@@ -208,7 +208,7 @@ async def geturls_py(platform, domain, api_token, account_id, database_id, timef
 
             
             for obj in cdx.iter(url,params):
-                
+                print('=======',obj)
                 data = {
                     # "url": snapshot.archive_url,
                     # "date": snapshot.timestamp
