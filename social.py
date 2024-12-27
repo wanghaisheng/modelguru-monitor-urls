@@ -192,14 +192,14 @@ async def geturls_py(platform, domain, api_token, account_id, database_id, timef
         # print(f"\nProcessing {len(snapshots)} URLs...")
 
 
-        cdx = cdx_toolkit.CDXFetcher(source='cc')
+        cdxtoolkit = cdx_toolkit.CDXFetcher(source='cc')
         print('init cdx toolkit')
         url = 'tiktok.com/tag/*'
         # https://github.com/cocrawler/cdx_toolkit
         from_timestamp = datetime(2024, 12, 22).strftime('%Y-%m-%dT%H:%M:%SZ')
         to_timestamp = datetime(2024, 12, 24).strftime('%Y-%m-%dT%H:%M:%SZ')
 
-        print(url, 'size estimate', cdx.get_size_estimate(url))
+        print(url, 'size estimate', cdxtoolkit.get_size_estimate(url))
 
         
         async with aiohttp.ClientSession() as session:
@@ -209,7 +209,7 @@ async def geturls_py(platform, domain, api_token, account_id, database_id, timef
     'to': to_timestamp}
 
             
-            for obj in cdx.iter(url,params):
+            for obj in cdxtoolkit.iter(url,params):
                 print('=======',obj)
                 data = {
                     # "url": snapshot.archive_url,
