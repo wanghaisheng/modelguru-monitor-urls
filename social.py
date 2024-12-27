@@ -1,3 +1,5 @@
+from urllib.parse import urlparse, parse_qs, unquote
+
 import aiohttp
 import csv
 import os
@@ -66,7 +68,7 @@ def check_environment_variables():
 
     return required_vars
 
-async def check_url_exists(platform,session, url, api_token, account_id, database_id):
+async def check_tag_exists(platform,session, tag, api_token, account_id, database_id):
     """Check if URL already exists in the table"""
     check_url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/database/{database_id}/query"
     
@@ -76,10 +78,10 @@ async def check_url_exists(platform,session, url, api_token, account_id, databas
     }
     
     payload = {
-        "sql": f"SELECT COUNT(*) as count FROM wayback_{platform}_hashtag_data WHERE url = ?",
-        "params": [url]
+        "sql": f"SELECT COUNT(*) as count FROM wayback_{platform}_hashtag_data WHERE tag = ?",
+        "params": [tag]
     }
-    print('check existing sql',  f"SELECT COUNT(*) as count FROM wayback_{platform}_hashtag_data WHERE url = ?"
+    print('check existing sql',  f"SELECT COUNT(*) as count FROM wayback_{platform}_hashtag_data WHERE tag = ?"
 )
     try:
         async with session.post(check_url, headers=headers, json=payload) as response:
@@ -129,10 +131,10 @@ async def test_cloudflare_connection(api_token, account_id, database_id):
 
 async def write_to_cloudflare_d1(platform,session, data, api_token, account_id, database_id):
     """Write data to Cloudflare D1"""
-    url_exists = await check_url_exists(platform,session, data['url'], api_token, account_id, database_id)
+    tag_exists = await check_tag_exists(platform,session, data['tag'], api_token, account_id, database_id)
     
-    if url_exists:
-        print(f"⚠ URL already exists, skipping: {data['url']}")
+    if tag_exists:
+        print(f"⚠ URL already exists, skipping: {data['tag']}")
         return
 
     url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/d1/database/{database_id}/query"
@@ -145,20 +147,47 @@ async def write_to_cloudflare_d1(platform,session, data, api_token, account_id, 
     current_time = datetime.datetime.utcnow().isoformat()
     
     payload = {
-        "sql": f"INSERT INTO wayback_{platform}_hashtag_data (url, date, updateAt) VALUES (?, ?, ?)",
-        "params": [data['url'], data['date'], current_time]
+        "sql": f"INSERT INTO wayback_{platform}_hashtag_data (tag,url, date, updateAt) VALUES (?,?, ?, ?)",
+        "params": [data['tag'],data['url'], data['date'], current_time]
     }
 
     try:
         async with session.post(url, headers=headers, json=payload) as response:
             if response.status == 200:
-                print(f"✓ Successfully inserted: {data['url']}")
+                print(f"✓ Successfully inserted: {data['tag'],data['url']}")
             else:
                 error_text = await response.text()
-                print(f"✗ Failed to insert: {data['url']}")
+                print(f"✗ Failed to insert: {data['tag'],data['url']}")
                 print(f"Error: {error_text}")
     except Exception as e:
         print(f"✗ Error writing to Cloudflare: {str(e)}")
+import re
+
+# Function to replace emojis in a string
+def replace_emojis(text, replacement=""):
+    # Regex pattern to match emojis
+    emoji_pattern = re.compile(
+        "["
+        "\U0001F600-\U0001F64F"  # Emoticons
+        "\U0001F300-\U0001F5FF"  # Symbols & Pictographs
+        "\U0001F680-\U0001F6FF"  # Transport & Map Symbols
+        "\U0001F700-\U0001F77F"  # Alchemical Symbols
+        "\U0001F780-\U0001F7FF"  # Geometric Shapes Extended
+        "\U0001F800-\U0001F8FF"  # Supplemental Arrows-C
+        "\U0001F900-\U0001F9FF"  # Supplemental Symbols and Pictographs
+        "\U0001FA00-\U0001FA6F"  # Chess Symbols
+        "\U0001FA70-\U0001FAFF"  # Symbols and Pictographs Extended-A
+        "\U00002702-\U000027B0"  # Dingbats
+        "\U000024C2-\U0001F251"  # Enclosed Characters
+        "\U0001F1E6-\U0001F1FF"  # Flags (iOS)
+        "]+",
+        flags=re.UNICODE,
+    )
+    # Replace all emojis with the replacement text
+    return emoji_pattern.sub(replacement, text)
+
+
+
 
 async def geturls_py(platform, domain, api_token, account_id, database_id, timeframe):
     """
@@ -216,13 +245,30 @@ async def geturls_py(platform, domain, api_token, account_id, database_id, timef
             
             for obj in cdxtoolkit.iter(**kwargs):
                 print('=======',obj)
+                url=obj['url'],
+                date=obj['timestamp']
+                parsed_url = urlparse(url)
+                path = parsed_url.path
+                decoded_path = unquote(path)
+                tag=None
+                if website_url=='tiktok.com':
+                    tag=decoded_path.split('tag')[0]
+                    if 'pc' in tag:
+                        tag=tag.split('/pc')[0]
+            
+                tag = replace_emojis(tag, replacement="")
+                
+                print('keep params clean',tag)
+                    
+                
                 data = {
                     # "url": snapshot.archive_url,
                     # "date": snapshot.timestamp
                 }
                 data={
-                "url":obj['url'],
-                'date':obj['timestamp']
+                "tag":tag,
+                "url":url,
+                'date':date
                 }
                 await write_to_cloudflare_d1(platform, session, data, api_token, account_id, database_id)
 
@@ -297,6 +343,10 @@ async def geturls(platform,domain, api_token, account_id, database_id, timeframe
                             if website_url in url:
                                 url=url.split(website_url)[-1]
                                 print('keep params only',url)
+                            if '?' in url:
+            
+                                url=url.split('?')[0]
+                                
                             if '&' in url:
                                 url=url.split('&')[0]
                                 print('keep params clean',url)
@@ -307,7 +357,7 @@ async def geturls(platform,domain, api_token, account_id, database_id, timeframe
                             }
                             await write_to_cloudflare_d1(platform,session, data, api_token, account_id, database_id)
                             
-                            # url_exists = await check_url_exists(platform,session, data['url'], api_token, account_id, database_id)
+                            # url_exists = await check_tag_exists(platform,session, data['url'], api_token, account_id, database_id)
                             # if url_exists:
                                 # total_skipped += 1
                             # else:
@@ -335,7 +385,8 @@ async def create_table(platform,api_token, account_id, database_id):
         "sql": f"""
         CREATE TABLE IF NOT EXISTS wayback_{platform}_hashtag_data (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            url TEXT NOT NULL UNIQUE,
+            tag TEXT NOT NULL UNIQUE,
+            url TEXT NOT NULL,
             date TEXT NOT NULL,
             updateAt TEXT NOT NULL
         )
@@ -451,7 +502,7 @@ async def main():
     )
 
 
-            await geturls(
+            await geturls_py(
         # env_vars['DOMAIN'],
           platform,
           url,
