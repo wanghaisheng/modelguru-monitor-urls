@@ -232,6 +232,7 @@ async def saveurls(platform, domain, api_token, account_id, database_id, timefra
                 date=obj[1].replace('timestamp','').strip()
                 print('url',url)
                 print('date',date)
+                print('website',website_url)
 
                 parsed_url = urlparse(url)
                 path = parsed_url.path
