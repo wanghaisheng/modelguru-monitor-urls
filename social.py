@@ -199,7 +199,7 @@ async def geturls_py(platform, domain, api_token, account_id, database_id, timef
         kwargs = {
     'url':url,
     'filter':"status=200",
-    'filter':"mime:html"
+    'filter':"mime:html",
     'from_ts': from_timestamp,
     'to': to_timestamp}
         
