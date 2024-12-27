@@ -244,7 +244,11 @@ async def saveurls(platform, domain, api_token, account_id, database_id, timefra
                         tag=tag.split('/pc')[0]
                     if '?' in tag:
                         tag=tag.split('?')[0]
-                tag = replace_emojis(tag, replacement="")
+                    tag = replace_emojis(tag, replacement="")
+                        
+                if 'ideogram.ai' in website_url:
+                    tag=decoded_path
+                    
                 
                 print('keep params clean',tag)
                     
