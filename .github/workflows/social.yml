@@ -26,7 +26,7 @@ jobs:
 
     - name: Install required Python dependencies
       run: |
-        pip install DataRecorder aiohttp pandas python-dotenv httpx cloudflare requests waybackpy
+        pip install DataRecorder aiohttp pandas python-dotenv httpx cloudflare requests waybackpy cdx_toolkit
 
     - name: Run the Google search parser script
       env:
