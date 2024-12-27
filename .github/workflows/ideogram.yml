@@ -1,0 +1,54 @@
+name: cli ideogram 
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: 'Domain URL'
+        required: false
+        type: string
+        default: "ideogram"
+      time_frame:
+        description: "30_days, 7_days, 1_day, 1_year, 6_months, 3_months"
+        required: false
+        type: string
+        default: '1'
+
+jobs:
+  google_search:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install required Python dependencies
+      run: |
+        pip install DataRecorder aiohttp pandas python-dotenv httpx cloudflare requests cdx_toolkit waybackpy
+
+    - name: Run cdxt command
+      run: |
+        cdxt --ia iter 'https://ideogram.ai/assets/progressive-image/balanced/response/*' > result.txt
+
+    - name: Run the Google search parser script
+      env:
+        DOMAIN: ${{ github.event.inputs.domain }}
+        TIME_FRAME: ${{ github.event.inputs.time_frame }}
+        CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        CLOUDFLARE_D1_DATABASE_ID: ${{ secrets.CLOUDFLARE_D1_DATABASE_ID }}
+      run: |
+        python save.py
+
+    # - name: Commit the results to the repository if there's a change
+      # run: |
+        # git config --global user.name "GitHub Action"
+        # git config --global user.email "action@github.com"
+        # git add -A
+        # git commit -m "Add new Google search results"
+        # git push
