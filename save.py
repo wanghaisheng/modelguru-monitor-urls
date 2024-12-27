@@ -239,10 +239,11 @@ async def saveurls(platform, domain, api_token, account_id, database_id, timefra
                 decoded_path = unquote(path)
                 tag=None
                 if website_url=='tiktok.com/tag/':
-                    tag=decoded_path.split('tag')[0]
+                    tag=decoded_path.split('/tag/')[0]
                     if 'pc' in tag:
                         tag=tag.split('/pc')[0]
-            
+                    if '?' in tag:
+                        tag=tag.split('?')[0]
                 tag = replace_emojis(tag, replacement="")
                 
                 print('keep params clean',tag)
