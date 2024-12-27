@@ -192,35 +192,37 @@ async def geturls_py(platform, domain, api_token, account_id, database_id, timef
         # print(f"\nProcessing {len(snapshots)} URLs...")
 
 
-        cdxtoolkit = cdx_toolkit.CDXFetcher(source='cc')
-        print('init cdx toolkit')
         url = 'tiktok.com/tag/*'
         # https://github.com/cocrawler/cdx_toolkit
         from_timestamp = datetime.datetime(2024, 12, 22).strftime('%Y-%m-%dT%H:%M:%SZ')
         to_timestamp = datetime.datetime(2024, 12, 24).strftime('%Y-%m-%dT%H:%M:%SZ')
+        kwargs = {
+    'source':'cc',
+    'from_ts': from_timestamp,
+    'to': to_timestamp}
+        
+        cdxtoolkit = cdx_toolkit.CDXFetcher(**kwargs)
+        
+        print('init cdx toolkit')
 
         print(url, 'size estimate', cdxtoolkit.get_size_estimate(url))
 
         
         async with aiohttp.ClientSession() as session:
             # for snapshot in urls:
-            params = {
-    'from': from_timestamp,
-    'to': to_timestamp}
 
             
-            for obj in cdxtoolkit.get(url):
+            for obj in cdxtoolkit.iter(url):
                 print('=======',obj)
-                if from_timestamp <= obj['timestamp'] <= to_timestamp:
-                    data = {
+                data = {
                     # "url": snapshot.archive_url,
                     # "date": snapshot.timestamp
                 }
-                    data={
+                data={
                 "url":obj['url'],
                 'date':obj['timestamp']
                 }
-                    await write_to_cloudflare_d1(platform, session, data, api_token, account_id, database_id)
+                await write_to_cloudflare_d1(platform, session, data, api_token, account_id, database_id)
 
         print(f"\n✓ Completed fetching and storing URLs for domain: {domainname}")
 
