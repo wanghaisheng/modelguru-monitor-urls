@@ -198,6 +198,7 @@ async def geturls_py(platform, domain, api_token, account_id, database_id, timef
         from_timestamp = datetime(2024, 12, 22).strftime('%Y-%m-%dT%H:%M:%SZ')
         to_timestamp = datetime(2024, 12, 24).strftime('%Y-%m-%dT%H:%M:%SZ')
 
+        print(url, 'size estimate', cdx.get_size_estimate(url))
 
         
         async with aiohttp.ClientSession() as session:
