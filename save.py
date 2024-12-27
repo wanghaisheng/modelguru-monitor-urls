@@ -224,13 +224,14 @@ async def saveurls(platform, domain, api_token, account_id, database_id, timefra
             # for snapshot in urls:
             for line in lines:
                 obj=line.split(',')
-            # for obj in cdxtoolkit.iter(**kwargs):
                 print('=======',obj)
                 if len(obj)==0:
                     return 
                 obj=[x.strip() for x in obj]
-                url=obj[2].split('url')[-1]
-                url=obj[1].split('timestamp')[-1]
+                url=obj[2].split('url')[-1].strip().replace('\n','')
+                date=obj[1].split('timestamp')[-1].strip()
+                print('url',url)
+                print('date',date)
 
                 parsed_url = urlparse(url)
                 path = parsed_url.path
