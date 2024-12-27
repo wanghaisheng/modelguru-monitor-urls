@@ -194,10 +194,12 @@ async def geturls_py(platform, domain, api_token, account_id, database_id, timef
 
         url = 'tiktok.com/tag/*'
         # https://github.com/cocrawler/cdx_toolkit
-        from_timestamp = datetime.datetime(2024, 12, 22).strftime('%Y-%m-%dT%H:%M:%SZ')
-        to_timestamp = datetime.datetime(2024, 12, 24).strftime('%Y-%m-%dT%H:%M:%SZ')
+        from_timestamp = datetime.datetime(2024, 12, 22).strftime('%Y%m%dT%H%M%S')
+        to_timestamp = datetime.datetime(2024, 12, 24).strftime('%Y%m%dT%H%M%S')
         kwargs = {
     'url':url,
+    'filter':"status=200",
+    'filter':"mime:html"
     'from_ts': from_timestamp,
     'to': to_timestamp}
         
