@@ -228,7 +228,7 @@ async def saveurls(platform, domain, api_token, account_id, database_id, timefra
                 if len(obj)==0:
                     return 
                 obj=[x.strip() for x in obj]
-                url=obj[2].split('url')[-1].strip().replace('\n','')
+                url=obj[2].replace('url','').strip().replace('\n','')
                 date=obj[1].split('timestamp')[-1].strip()
                 print('url',url)
                 print('date',date)
