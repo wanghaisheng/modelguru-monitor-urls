@@ -193,6 +193,7 @@ async def geturls_py(platform, domain, api_token, account_id, database_id, timef
 
 
         cdx = cdx_toolkit.CDXFetcher(source='cc')
+        print('init cdx toolkit')
         url = 'tiktok.com/tag/*'
         # https://github.com/cocrawler/cdx_toolkit
         from_timestamp = datetime(2024, 12, 22).strftime('%Y-%m-%dT%H:%M:%SZ')
