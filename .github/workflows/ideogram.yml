@@ -33,7 +33,7 @@ jobs:
 
     - name: Run cdxt command
       run: |
-        cdxt --ia iter 'https://ideogram.ai/assets/progressive-image/balanced/response/*' > result.txt
+        cdxt --ia iter 'https://ideogram.ai/assets/*' > result.txt
 
     - name: Run the Google search parser script
       env:
