@@ -235,6 +235,8 @@ async def geturls(platform,domain, api_token, account_id, database_id, timeframe
 
 
     query_url='http://web.archive.org/cdx/search/cdx?url=tiktok.com/tag/&collapse=urlkey&matchType=prefix&from=20241223&to=20241225'
+    query_url='http://web.archive.org/cdx/search/cdx?url=tiktok.com/tag/&collapse=urlkey&matchType=prefix&from=202411&to=202412'
+
     async with aiohttp.ClientSession() as session:
         try:
             async with session.get(query_url, headers=headers) as resp:
