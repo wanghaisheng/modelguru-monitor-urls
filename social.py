@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import sys
 from waybackpy import WaybackMachineCDXServerAPI
 from waybackpy.wrapper import Url
+import cdx_toolkit
 
 load_dotenv()
 
@@ -183,18 +184,31 @@ async def geturls_py(platform, domain, api_token, account_id, database_id, timef
     try:
         # Initialize Wayback Machine CDX Server API
         # cdx_api = WaybackMachineCDXServerAPI(url=domainname,start_timestamp=start[:7], end_timestamp=end[:7])
-        cdx_api=Url(domainname)
+        # cdx_api=Url(domainname)
         # Fetch snapshots between the specified time range
 
-        urls = cdx_api.known_urls()
+        # urls = cdx_api.known_urls()
 
         # print(f"\nProcessing {len(snapshots)} URLs...")
 
+
+        cdx = cdx_toolkit.CDXFetcher(source='cc')
+        url = 'tiktok.com/tag/*'
+        # https://github.com/cocrawler/cdx_toolkit
+
+
+        
         async with aiohttp.ClientSession() as session:
-            for snapshot in urls:
+            # for snapshot in urls:
+            for obj in cdx.iter(url,from='202412222359',to='202412242359'):
+                
                 data = {
-                    "url": snapshot.archive_url,
-                    "date": snapshot.timestamp
+                    # "url": snapshot.archive_url,
+                    # "date": snapshot.timestamp
+                }
+                data={
+                "url":obj['url']
+                'date':obj['timestamp']
                 }
                 await write_to_cloudflare_d1(platform, session, data, api_token, account_id, database_id)
 
@@ -235,7 +249,7 @@ async def geturls(platform,domain, api_token, account_id, database_id, timeframe
 
 
     query_url='http://web.archive.org/cdx/search/cdx?url=tiktok.com/tag/&collapse=urlkey&matchType=prefix&from=20241223&to=20241225'
-    query_url='http://web.archive.org/cdx/search/cdx?url=tiktok.com/tag/&collapse=digest&matchType=prefix&from=202411&to=202412'
+    query_url='http://web.archive.org/cdx/search/cdx?url=tiktok.com/tag/&collapse=digest&matchType=prefix&from=2024&to=2024&fl=original,timestamp'
 
     async with aiohttp.ClientSession() as session:
         try:
@@ -262,6 +276,7 @@ async def geturls(platform,domain, api_token, account_id, database_id, timeframe
                                 url=url.split(website_url)[-1]
                                 if '&' in url:
                                     url=url.split('&')[0]
+                            if parts[0] 
                             data = {
                                 "url": url,
                                 "date": parts[0]
@@ -408,7 +423,7 @@ async def main():
     )
 
 
-            await geturls(
+            await geturls_py(
         # env_vars['DOMAIN'],
           platform,
           url,
