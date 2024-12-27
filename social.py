@@ -419,6 +419,7 @@ async def main():
   {"xhs":"https://www.xiaohongshu.com/search_result/?keyword="},
         {'ideogram':"https://ideogram.ai/assets/progressive-image/balanced/response/"},
         {'crazygames':"https://crazygames.com/"}
+        # https://www.bbc.co.uk/bitesize/articles/zkw96rd
     # Add other links as needed
 ]
     domain=env_vars['DOMAIN'].lower()
