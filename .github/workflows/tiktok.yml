@@ -1,18 +1,19 @@
-name: reddit hashtag
+name: cli tiktok hashtag
 
 on:
   workflow_dispatch:
     inputs:
       domain:
-        description: 'domain url'
+        description: 'Domain URL'
         required: false
         type: string
-        default: "reddit"
+        default: "tiktok"
       time_frame:
-        description: "30_days,7_days,1_day,1_year,6_months,3_months"
+        description: "30_days, 7_days, 1_day, 1_year, 6_months, 3_months"
         required: false
         type: string
         default: '1'
+
 jobs:
   google_search:
     runs-on: ubuntu-latest
@@ -30,6 +31,10 @@ jobs:
       run: |
         pip install DataRecorder aiohttp pandas python-dotenv httpx cloudflare requests
 
+    - name: Run cdxt command
+      run: |
+        cdxt --ia --limit 1 --from 202412232359 --to 202412242359 iter 'tiktok.com/tag/*' > result.txt
+
     - name: Run the Google search parser script
       env:
         DOMAIN: ${{ github.event.inputs.domain }}
@@ -38,13 +43,12 @@ jobs:
         CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         CLOUDFLARE_D1_DATABASE_ID: ${{ secrets.CLOUDFLARE_D1_DATABASE_ID }}
       run: |
-        python social.py
+        python save.py
 
     # - name: Commit the results to the repository if there's a change
       # run: |
         # git config --global user.name "GitHub Action"
         # git config --global user.email "action@github.com"
-      
         # git add -A
         # git commit -m "Add new Google search results"
         # git push
