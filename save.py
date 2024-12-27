@@ -204,6 +204,8 @@ async def saveurls(platform, domain, api_token, account_id, database_id, timefra
     except ValueError:
         print("⚠ Invalid timeframe value, using default (2)")
         timeframe_index = 2
+    website_url=domain.replace('https://','')
+    website_url=website_url.replace('www.','')    
 
     start, end = get_time_range(filters[timeframe_index])
 
