@@ -281,8 +281,8 @@ async def geturls(platform,domain, api_token, account_id, database_id, timeframe
                             url=parts[1]
                             if website_url in url:
                                 url=url.split(website_url)[-1]
-                                if '&' in url:
-                                    url=url.split('&')[0]
+                            if '&' in url:
+                                url=url.split('&')[0]
                             data = {
                                 "url": url,
                                 "date": parts[0]
