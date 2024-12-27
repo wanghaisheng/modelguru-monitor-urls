@@ -214,7 +214,7 @@ async def geturls_py(platform, domain, api_token, account_id, database_id, timef
                     # "date": snapshot.timestamp
                 }
                 data={
-                "url":obj['url']
+                "url":obj['url'],
                 'date':obj['timestamp']
                 }
                 await write_to_cloudflare_d1(platform, session, data, api_token, account_id, database_id)
