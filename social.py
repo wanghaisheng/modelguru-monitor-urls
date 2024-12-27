@@ -292,6 +292,8 @@ async def geturls(platform,domain, api_token, account_id, database_id, timeframe
                         
                         if len(parts) >= 2:
                             url=parts[1]
+                        print('preprocessing url',website_url in url, '?' in url,'&' in url)
+                            
                             if website_url in url:
                                 url=url.split(website_url)[-1]
                                 print('keep params only',url)
@@ -424,7 +426,7 @@ async def main():
         {'ideogram':"https://ideogram.ai/assets/progressive-image/balanced/response/"},
         {'crazygames':"https://crazygames.com/"}
 
-        
+        # tumblr
         # https://mashable.com/article/very-demure-very-mindful-meaning-tiktok
         # https://www.cosmopolitan.com/entertainment/celebs/a61865984/very-demure-tiktok-trend/
         # Add other links as needed
