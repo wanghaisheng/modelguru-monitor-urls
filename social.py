@@ -230,8 +230,11 @@ async def geturls(platform,domain, api_token, account_id, database_id, timeframe
         'Referer': 'https://web.archive.org/',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
     }
-    query_url = 'http://web.archive.org/cdx/search/cdx?url=https://www.' + website_url + '*&collapse=digest&filter=!statuscode:404&showResumeKey=true&matchType=prefix&from=%s&to=%s&limit=%s&output=json'%(start,end,chunk_size)
+    query_url = 'http://web.archive.org/cdx/search/cdx?url=https://www.' + website_url + '*&collapse=urlkey&filter=!statuscode:404&showResumeKey=true&matchType=prefix&from=%s&to=%s&limit=%s&output=json'%(start,end,chunk_size)
+# https://github.com/internetarchive/wayback/blob/master/wayback-cdx-server/README.md
 
+
+    query_url='http://web.archive.org/cdx/search/cdx?url=tiktok.com/tag/&collapse=urlkey&matchType=prefix&from=20241223&to=20241225'
     async with aiohttp.ClientSession() as session:
         try:
             async with session.get(query_url, headers=headers) as resp:
