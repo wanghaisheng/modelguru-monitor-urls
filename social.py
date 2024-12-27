@@ -209,17 +209,18 @@ async def geturls_py(platform, domain, api_token, account_id, database_id, timef
     'to': to_timestamp}
 
             
-            for obj in cdxtoolkit.get(url,params):
+            for obj in cdxtoolkit.get(url):
                 print('=======',obj)
-                data = {
+                if from_timestamp <= timestamp <= to_timestamp:
+                    data = {
                     # "url": snapshot.archive_url,
                     # "date": snapshot.timestamp
                 }
-                data={
+                    data={
                 "url":obj['url'],
                 'date':obj['timestamp']
                 }
-                await write_to_cloudflare_d1(platform, session, data, api_token, account_id, database_id)
+                    await write_to_cloudflare_d1(platform, session, data, api_token, account_id, database_id)
 
         print(f"\n✓ Completed fetching and storing URLs for domain: {domainname}")
 
