@@ -33,9 +33,7 @@ jobs:
 
     - name: Run cdxt command
       run: |
-        cdxt --ia 
-        # --limit 100
-        --from 202412232359 --to 202412242359 iter 'tiktok.com/tag/*' > result.txt
+        cdxt --ia --from 202412232359 --to 202412242359 iter 'tiktok.com/tag/*' > result.txt
 
     - name: Run the Google search parser script
       env:
