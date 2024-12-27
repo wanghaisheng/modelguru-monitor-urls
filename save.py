@@ -238,7 +238,7 @@ async def saveurls(platform, domain, api_token, account_id, database_id, timefra
                 path = parsed_url.path
                 decoded_path = unquote(path)
                 tag=None
-                if website_url=='tiktok.com':
+                if website_url=='tiktok.com/tag/':
                     tag=decoded_path.split('tag')[0]
                     if 'pc' in tag:
                         tag=tag.split('/pc')[0]
