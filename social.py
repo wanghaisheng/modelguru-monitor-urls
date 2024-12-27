@@ -292,7 +292,7 @@ async def geturls(platform,domain, api_token, account_id, database_id, timeframe
                         
                         if len(parts) >= 2:
                             url=parts[1]
-                        print('preprocessing url',website_url in url, '?' in url,'&' in url)
+                            print('preprocessing url',website_url in url, '?' in url,'&' in url)
                             
                             if website_url in url:
                                 url=url.split(website_url)[-1]
