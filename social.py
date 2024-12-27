@@ -265,10 +265,13 @@ async def geturls(platform,domain, api_token, account_id, database_id, timeframe
     query_url='http://web.archive.org/cdx/search/cdx?url=tiktok.com/tag/&collapse=urlkey&matchType=prefix&from=20241223&to=20241225'
     query_url='http://web.archive.org/cdx/search/cdx?url=tiktok.com/tag/&collapse=digest&matchType=prefix&from=2024&to=2024&fl=original,timestamp'
     query_url='http://web.archive.org/cdx/search/cdx?url=tiktok.com/tag/&collapse=urlkey&matchType=prefix&from=2024&to=2024'
+    query_url='http://web.archive.org/cdx/search/cdx?url=tiktok.com/tag/&collapse=urlkey&matchType=prefix&from=2023&to=2023'
+    
     print('build query url',query_url)
     async with aiohttp.ClientSession() as session:
         try:
-            async with session.get(query_url, headers=headers) as resp:
+            async with session.get(query_url, headers=headers,
+                                   timeout=300000) as resp:
                 if resp.status != 200:
                     print(f"✗ Wayback Machine API returned status {resp.status}")
                     return
