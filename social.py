@@ -264,6 +264,7 @@ async def geturls(platform,domain, api_token, account_id, database_id, timeframe
 
     query_url='http://web.archive.org/cdx/search/cdx?url=tiktok.com/tag/&collapse=urlkey&matchType=prefix&from=20241223&to=20241225'
     query_url='http://web.archive.org/cdx/search/cdx?url=tiktok.com/tag/&collapse=digest&matchType=prefix&from=2024&to=2024&fl=original,timestamp'
+    query_url='http://web.archive.org/cdx/search/cdx?url=tiktok.com/tag/&collapse=urlkey&matchType=prefix&from=2024&to=2024'
 
     async with aiohttp.ClientSession() as session:
         try:
@@ -436,7 +437,7 @@ async def main():
     )
 
 
-            await geturls_py(
+            await geturls(
         # env_vars['DOMAIN'],
           platform,
           url,
