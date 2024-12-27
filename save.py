@@ -220,12 +220,13 @@ async def saveurls(platform, domain, api_token, account_id, database_id, timefra
         
         async with aiohttp.ClientSession() as session:
             # for snapshot in urls:
-            for obj in lines:
-                
+            for line in lines:
+                obj=line.split(',')
             # for obj in cdxtoolkit.iter(**kwargs):
                 print('=======',obj)
-                url=obj['url'],
-                date=obj['timestamp']
+                url=obj[2].split('url')[-1]
+                url=obj[1].split('timestamp')[-1]
+
                 parsed_url = urlparse(url)
                 path = parsed_url.path
                 decoded_path = unquote(path)
