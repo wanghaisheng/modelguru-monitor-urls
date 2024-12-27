@@ -211,7 +211,7 @@ async def geturls_py(platform, domain, api_token, account_id, database_id, timef
             
             for obj in cdxtoolkit.get(url):
                 print('=======',obj)
-                if from_timestamp <= timestamp <= to_timestamp:
+                if from_timestamp <= obj['timestamp'] <= to_timestamp:
                     data = {
                     # "url": snapshot.archive_url,
                     # "date": snapshot.timestamp
