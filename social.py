@@ -197,11 +197,11 @@ async def geturls_py(platform, domain, api_token, account_id, database_id, timef
         from_timestamp = datetime.datetime(2024, 12, 22).strftime('%Y-%m-%dT%H:%M:%SZ')
         to_timestamp = datetime.datetime(2024, 12, 24).strftime('%Y-%m-%dT%H:%M:%SZ')
         kwargs = {
-    'source':'cc',
+    'url':url,
     'from_ts': from_timestamp,
     'to': to_timestamp}
         
-        cdxtoolkit = cdx_toolkit.CDXFetcher(**kwargs)
+        cdxtoolkit = cdx_toolkit.CDXFetcher(source='cc')
         
         print('init cdx toolkit')
 
@@ -212,7 +212,7 @@ async def geturls_py(platform, domain, api_token, account_id, database_id, timef
             # for snapshot in urls:
 
             
-            for obj in cdxtoolkit.iter(url):
+            for obj in cdxtoolkit.iter(**kwargs):
                 print('=======',obj)
                 data = {
                     # "url": snapshot.archive_url,
