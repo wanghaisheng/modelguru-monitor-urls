@@ -106,7 +106,7 @@ def get_category_urls(domain):
             links = appc.children()
             for a in links:
                 url = a.link
-                if url and 'href="https://apps.apple.com/us/charts' in url:
+                if url and 'https://apps.apple.com/us/charts' in url:
                     csv_file.add_data(url)
                     curls.append(url)
 
