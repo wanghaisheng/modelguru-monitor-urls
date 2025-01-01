@@ -69,7 +69,7 @@ async def get_urls_from_archive(domain, start, end):
     try:
         async with aiohttp.ClientSession(connector=None) as session:
             async with session.get(query_url, headers=headers, 
-                                   proxy='http://127.0.0.1:1080',
+                                   # proxy='http://127.0.0.1:1080',
                                    timeout=3000) as resp:
                 if resp.status != 200:
                     print(f"Received status code {resp.status}.")
