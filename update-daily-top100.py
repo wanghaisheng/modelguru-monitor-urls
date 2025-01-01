@@ -121,6 +121,7 @@ def getids_from_category(url, outfile):
     """
     Extract app details from a category URL.
     """
+    full_url=None
     try:
         tab = browser.new_tab()
         cid = url.split('/')[-1]
@@ -131,6 +132,7 @@ def getids_from_category(url, outfile):
         for chart_type in ['chart=top-free', 'chart=top-paid']:
             type = chart_type.split('-')[-1]
             full_url = f"{url}?{chart_type}"
+            print('detect apps:',full_url)
             tab.get(full_url)
 
             links = tab.ele('.l-row chart').children()
@@ -154,7 +156,7 @@ def getids_from_category(url, outfile):
                     "updateAt": datetime.now()
                 })
     except Exception as e:
-        print(f"Error processing category URL {url}: {e}")
+        print(f"Error processing category URL {full_url}: {e}")
 
 
 async def get_urls_from_archive(domain, start, end):
