@@ -93,7 +93,7 @@ def get_category_urls(domain):
         tab = browser.new_tab()
         domainname = domain.replace("https://", "").replace('/', '-')
         tab.get(domain)
-
+        print('click app or game button')
         buttons = tab.ele('.we-genre-filter__triggers-list').eles('t:button')
         csv_filepath = f'{RESULT_FOLDER}/top-app-category-{domainname}.csv'
         csv_file = Recorder(csv_filepath)
@@ -101,6 +101,7 @@ def get_category_urls(domain):
         curls = []
         for button in buttons:
             button.click()
+            print('detect c url')
             appc = tab.ele('.we-genre-filter__categories-list l-content-width')
             links = appc.children()
             for a in links:
