@@ -1,4 +1,4 @@
-name: Submit apps
+name: update total apps id
 
 on:
   push:
@@ -36,6 +36,9 @@ jobs:
       - name: Create GitHub release
         id: create_release
         uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        
         with:
           tag_name: v${{ github.run_number }}
           release_name: Scrape Results v${{ github.run_number }}
