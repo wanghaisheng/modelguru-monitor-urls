@@ -8,6 +8,7 @@ from aiohttp_socks import ProxyType, ProxyConnector, ChainProxyConnector
 from DataRecorder import Recorder
 import pandas as pd
 from getbrowser import setup_chrome
+from app_store_scraper import AppStore
 
 # Environment Variables
 D1_DATABASE_ID = os.getenv('D1_APP_DATABASE_ID')
@@ -136,7 +137,10 @@ def getids_from_category(url, outfile):
             links = tab.ele('.l-row chart').children()
             for link in links:
                 app_link = link.ele('tag:a').link
+                if app_link:
+                    return 
                 icon = link.ele('.we-lockup__overlay').ele('t:img').link
+                appname=app_link.split('/')[-2]
                 rank = link.ele('.we-lockup__rank').text
                 title = link.ele('.we-lockup__text ').text
 
@@ -146,6 +150,7 @@ def getids_from_category(url, outfile):
                     "type": type,
                     "cid": cid,
                     "cname": cname,
+                    "appname":appname,
                     "rank": rank,
                     "appid": app_link.split('/')[-1],
                     "icon": icon,
@@ -186,6 +191,15 @@ async def get_urls_from_archive(domain, start, end):
     except Exception as e:
         print(f"Error fetching archive URLs for {domain}: {e}")
 
+def getReivew(item,outfile)
+    app = AppStore(country=item['country'],app_name=item['appname'])
+    app.review(sleep = random.randint(3,6))
+    for review in app.reviews:
+        item['score']= review['rating']
+        item['userName']= review['userName']
+        item['review']= review['review'].replace('\r',' ').replace('\n',' ')
+        outfile.add_data(item)
+
 
 async def main():
     """
@@ -194,24 +208,35 @@ async def main():
     try:
         os.makedirs(RESULT_FOLDER, exist_ok=True)
         current_time = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-        
+
         outfile_path = f'{RESULT_FOLDER}/top-100-app-{current_time}.csv'
+        outfile = Recorder(outfile_path)
 
         for domain in DOMAIN_LIST:
             print(f"Processing domain: {domain}")
             category_urls = get_category_urls(domain)
             print(f'category urls:{category_urls}')
-            outfile = Recorder(outfile_path)
-            test_category_urls=[
+            category_urls=[
 
                 'https://apps.apple.com/us/charts/iphone/health-fitness-apps/6013',
             ]
             for url in category_urls:
                 getids_from_category(url, outfile)
-
-            save_csv_to_d1(outfile_path)
         outfile.record()
+# get reviews
+        outfile_reviews_path = f'{RESULT_FOLDER}/top-100-app-reviews-{current_time}.csv'
+        outfile_reviews = Recorder(outfile_reviews_path)
+        if downloadreview==False:
+            return 
+        df=pd.read_csv(outfile_path)
+        lang='en'
+        for item in df.iterrows():
+        
+            app_store_scraper(item,lang)
 
+        outfile_reviews.record()
+
+    
     except Exception as e:
         print(f"Error in main execution: {e}")
 
