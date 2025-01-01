@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'  # Ensure your required version is used
+          python-version: '3.9'  # Ensure your required version is used
 
       - name: Install dependencies
         run: |
@@ -29,24 +29,8 @@ jobs:
         env:
           RESULT_FOLDER: ./result  # Adjust if necessary
           OUTPUT_FOLDER: ./output
-
-      - name: Create release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        
+      - name: upload files          
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: app-store-data-${{ github.run_number }}
-          release_name: App Store Data
-          draft: false
-          prerelease: false
-          body: "Results of App Store data processing."
-
-      - name: Upload artifacts to release
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./result/top-100-app-*.csv
-          asset_name: top-100-app.csv
-          asset_content_type: text/csv
+            name: healthapps
+            path: ./result/ # or path/to/artifact
