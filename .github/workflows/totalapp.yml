@@ -33,15 +33,6 @@ jobs:
           mkdir -p output
           tar -czf output/results.tar.gz result/
 
-      - name: Upload results as release asset
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: output/results.tar.gz
-          asset_name: results.tar.gz
-          asset_content_type: application/gzip
-
       - name: Create GitHub release
         id: create_release
         uses: actions/create-release@v1
@@ -50,3 +41,11 @@ jobs:
           release_name: Scrape Results v${{ github.run_number }}
           draft: false
           prerelease: false
+
+      - name: Upload results as release asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: output/results.tar.gz
+          asset_name: results.tar.gz
+          asset_content_type: application/gzip
