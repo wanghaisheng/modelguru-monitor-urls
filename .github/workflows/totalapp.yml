@@ -33,7 +33,7 @@ jobs:
           mkdir -p output
           tar -czf output/results.tar.gz result/
       - name: Make a 1GB random binary file
-      - uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4
         with:
           name: all-appids
           path: result/
