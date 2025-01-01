@@ -9,7 +9,7 @@ from DataRecorder import Recorder
 import pandas as pd
 from getbrowser import setup_chrome
 from app_store_scraper import AppStore
-
+import requests
 # Environment Variables
 D1_DATABASE_ID = os.getenv('D1_APP_DATABASE_ID')
 CLOUDFLARE_ACCOUNT_ID = os.getenv('CLOUDFLARE_ACCOUNT_ID')
@@ -226,8 +226,7 @@ async def main():
 # get reviews
         outfile_reviews_path = f'{RESULT_FOLDER}/top-100-app-reviews-{current_time}.csv'
         outfile_reviews = Recorder(outfile_reviews_path)
-        if downloadreview==False:
-            return 
+
         df=pd.read_csv(outfile_path)
         lang='en'
         for item in df.iterrows():
