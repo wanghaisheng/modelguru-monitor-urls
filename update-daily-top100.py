@@ -237,7 +237,7 @@ async def main():
         lang='en'
         for index, row in df.iterrows():
         
-            app_store_scraper(item,outfile)
+            app_store_scraper(row,outfile)
 
         outfile_reviews.record()
 
