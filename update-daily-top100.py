@@ -235,7 +235,7 @@ async def main():
 
         df=pd.read_csv(outfile_path)
         lang='en'
-        for item in df.iterrows():
+        for index, row in df.iterrows():
         
             app_store_scraper(item,outfile)
 
