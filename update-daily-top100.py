@@ -140,7 +140,7 @@ def getids_from_category(url, outfile):
                 app_link = link.ele('tag:a').link
                 icon = link.ele('.we-lockup__overlay').ele('t:img').link
                 rank = link.ele('.we-lockup__rank').text
-                title = link.ele('.we-lockup__title').text
+                title = link.ele('.we-lockup__text ').text
 
                 outfile.add_data({
                     "platform": platform,
