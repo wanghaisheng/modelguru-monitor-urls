@@ -226,6 +226,8 @@ async def main():
 # get reviews
         outfile_reviews_path = f'{RESULT_FOLDER}/top-100-app-reviews-{current_time}.csv'
         outfile_reviews = Recorder(outfile_reviews_path)
+        if downloadreview==False:
+            return 
 
         df=pd.read_csv(outfile_path)
         lang='en'
