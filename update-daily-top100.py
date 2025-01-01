@@ -196,6 +196,7 @@ async def main():
         for domain in DOMAIN_LIST:
             print(f"Processing domain: {domain}")
             category_urls = get_category_urls(domain)
+            print(f'category urls:{category_urls}')
             current_time = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
             outfile_path = f'{RESULT_FOLDER}/top-100-app-{current_time}.csv'
             outfile = Recorder(outfile_path)
