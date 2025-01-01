@@ -121,18 +121,16 @@ def getids_from_category(url, outfile):
     """
     Extract app details from a category URL.
     """
-    full_url=None
     try:
         tab = browser.new_tab()
         cid = url.split('/')[-1]
         cname = url.split('/')[-2]
         platform = url.split('/')[-3]
-        country = url.split('/')[-4]
+        country = url.split('/')[-5]
 
         for chart_type in ['chart=top-free', 'chart=top-paid']:
             type = chart_type.split('-')[-1]
             full_url = f"{url}?{chart_type}"
-            print('detect apps:',full_url)
             tab.get(full_url)
 
             links = tab.ele('.l-row chart').children()
@@ -156,7 +154,7 @@ def getids_from_category(url, outfile):
                     "updateAt": datetime.now()
                 })
     except Exception as e:
-        print(f"Error processing category URL {full_url}: {e}")
+        print(f"Error processing category URL {url}: {e}")
 
 
 async def get_urls_from_archive(domain, start, end):
@@ -203,7 +201,10 @@ async def main():
             current_time = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
             outfile_path = f'{RESULT_FOLDER}/top-100-app-{current_time}.csv'
             outfile = Recorder(outfile_path)
+            test_category_urls=[
 
+                'https://apps.apple.com/us/charts/iphone/health-fitness-apps/6013',
+            ]
             for url in category_urls:
                 getids_from_category(url, outfile)
 
