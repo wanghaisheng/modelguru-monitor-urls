@@ -1,0 +1,26 @@
+name: Sitemap URL Extractor
+description: Extract URLs from sitemap.xml
+author: Tom Carrio
+
+inputs:
+  sitemap-url:
+    required: true
+    description: e.g. https://www.eearomatics.com/sitemap.xml
+  replace-domain:
+    required: false
+    description: Set to replace domain in sitemap
+    
+outputs:
+  urls:
+    description: URLs separated by new lines
+    
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
+
+branding:
+  icon: bookmark
+  color: green
+
+
+  
