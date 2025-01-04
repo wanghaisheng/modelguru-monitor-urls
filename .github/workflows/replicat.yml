@@ -1,5 +1,46 @@
-# https://replicate.com/search?query=
-#获取所有模型连接
-#获取调用次数
-#保存
-#获取每日分析报告
+name: replicate model
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: 'domain url'
+        required: false
+        type: string
+      time_frame:
+        description: "30_days,7_days,1_day,1_year,6_months,3_months"
+        required: false
+        type: string
+jobs:
+  google_search:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install required Python dependencies
+      run: |
+        pip install DataRecorder aiohttp pandas python-dotenv httpx cloudflare requests waybackpy cdx_toolkit bs4
+
+    - name: Run the Google search parser script
+      env:
+        CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        CLOUDFLARE_D1_DATABASE_ID: ${{ secrets.CLOUDFLARE_D1_DATABASE_ID }}
+      run: |
+        python replicate.py
+
+    # - name: Commit the results to the repository if there's a change
+      # run: |
+        # git config --global user.name "GitHub Action"
+        # git config --global user.email "action@github.com"
+      
+        # git add -A
+        # git commit -m "Add new Google search results"
+        # git push
