@@ -107,7 +107,8 @@ def main():
     # Process each subsitemap
     for subsitemap_url in subsitemaps:
         if subsitemap_url!='https://replicate.com/sitemap-models.xml':
-            return 'not supported yet'
+            print( f'not supported yet:{subsitemap_url}')
+            continue
         print(f"[INFO] Parsing subsitemap: {subsitemap_url}")
         model_urls = parse_sitemap(subsitemap_url)
         for model_url in model_urls:
