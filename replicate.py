@@ -41,9 +41,9 @@ def get_model_runs(url):
         response = requests.get(url)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
-        run_span = soup.find("span", class_="text-r8-sm")
+        run_span = soup.find("ul", class_="mt-3 flex gap-4 items-center flex-wrap")
         if run_span:
-            t =run_span.get_text(strip=True).lower().replace("runs", "").replace('public','').strip()
+            t =run_span.get_text(strip=True).lower().replace("runs", "").replace('public','').replace('weights','').strip()
             print('-----',t)
             print('mode url',url)
             if t is None:
