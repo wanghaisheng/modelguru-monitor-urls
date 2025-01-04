@@ -99,6 +99,7 @@ def main():
 
     # Parse the root sitemap
     subsitemaps = parse_sitemap(ROOT_SITEMAP_URL)
+    print('detected sitemap',subsitemaps)
     if not subsitemaps:
         print("[ERROR] No subsitemaps found.")
         return
