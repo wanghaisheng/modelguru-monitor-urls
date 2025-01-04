@@ -45,6 +45,9 @@ def get_model_runs(url):
         if run_span:
             t =run_span.get_text(strip=True).lower().replace("runs", "").replace('public','').strip()
             print('-----',t)
+            print('mode url',url)
+            if t is None:
+                t=0
             run_count=int(t)
             return run_count
         else:
