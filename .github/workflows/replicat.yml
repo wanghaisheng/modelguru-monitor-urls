@@ -2,15 +2,9 @@ name: replicate model
 
 on:
   workflow_dispatch:
-    inputs:
-      domain:
-        description: 'domain url'
-        required: false
-        type: string
-      time_frame:
-        description: "30_days,7_days,1_day,1_year,6_months,3_months"
-        required: false
-        type: string
+  schedule:
+    - cron: "00 12 * * *"
+
 jobs:
   google_search:
     runs-on: ubuntu-latest
