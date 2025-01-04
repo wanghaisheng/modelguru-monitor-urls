@@ -48,16 +48,15 @@ def get_model_runs(url):
             t=t.lower()
             t=t.split('runs')[0]
             t=t.replace('public','')
+            if '\n' in t:
+                t.replace('\n','').strip()            
             if 'k' in t:
                 t=int(t.replace('k',''))*1000
             if 'm' in t:
                 t=int(t.replace('m',''))*1000000
                 
             t=t.replace("runs", "").replace('public','').replace('weights','').strip()
-            t
             print('mode url',url)
-            if '\n' in t:
-                t=t.split('\n')[0]
             if t is None:
                 t=0
             run_count=int(t)
