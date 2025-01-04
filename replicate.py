@@ -57,7 +57,6 @@ def get_model_runs(url):
             if 'm' in t:
                 t=int(t.replace('m',''))*1000000
                 
-            t=t.replace("runs", "").replace('public','').replace('weights','').strip()
             print('mode url',url)
             if t is None:
                 t=0
@@ -66,7 +65,7 @@ def get_model_runs(url):
         else:
             print(f"[WARNING] No run count found on page: {url}")
             return None
-    except requests.RequestException as e:
+    except Exception as e:
         print(f"[ERROR] Failed to fetch model page {url}: {e}")
         return None
 
