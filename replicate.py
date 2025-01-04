@@ -1,16 +1,3 @@
-#https://replicate.com/recraft-ai/recraft-20b
-#parse sitemap 
-#https://replicate.com/sitemap.xml
-
-
-#https://replicate.com/sitemap-collections.xml
-# 获取类别
-
-# https://replicate.com/sitemap-models.xml
-# 获取模型url
-# <loc>https://replicate.com/processone1/evelyn-oberleitner-pictures</loc>
-#解析调用次数
-
 import os
 import requests
 import time
@@ -39,10 +26,13 @@ def parse_sitemap(url):
     try:
         response = requests.get(url)
         response.raise_for_status()
-        soup = BeautifulSoup(response.content, "xml")
+        soup = BeautifulSoup(response.content, "xml")  # Requires lxml
         return [loc.text for loc in soup.find_all("loc")]
     except requests.RequestException as e:
         print(f"[ERROR] Failed to fetch sitemap {url}: {e}")
+        return []
+    except Exception as e:
+        print(f"[ERROR] Parsing error: {e}")
         return []
 
 # Helper: Fetch model page and extract run count
@@ -69,6 +59,7 @@ def create_table_if_not_exists():
         id SERIAL PRIMARY KEY,
         model_url TEXT UNIQUE,
         run_count INTEGER,
+        createAt TEXT,
         updateAt TEXT
     );
     """
@@ -83,12 +74,14 @@ def create_table_if_not_exists():
 
 # Helper: Insert or update model data
 def upsert_model_data(model_url, run_count):
-    updateAt = datetime.utcnow().isoformat()
+    current_time = datetime.utcnow().isoformat()
     sql = f"""
-    INSERT INTO replicate_model_data (model_url, run_count, updateAt)
-    VALUES ('{model_url}', {run_count}, '{updateAt}')
+    INSERT INTO replicate_model_data (model_url, run_count, createAt, updateAt)
+    VALUES ('{model_url}', {run_count}, '{current_time}', '{current_time}')
     ON CONFLICT (model_url) DO UPDATE
-    SET run_count = {run_count}, updateAt = '{updateAt}';
+    SET run_count = {run_count}, 
+        updateAt = '{current_time}',
+        createAt = replicate_model_data.createAt; -- Preserve old createAt value
     """
     payload = {"sql": sql}
     url = f"{CLOUDFLARE_BASE_URL}/query"
@@ -111,10 +104,9 @@ def main():
         return
 
     # Process each subsitemap
-  
     for subsitemap_url in subsitemaps:
-        if  subsitemap_url != 'https://replicate.com/sitemap-models.xml':
-            return f'currently we dont support:{subsitemap_url}'
+        if subsitemap_url!='https://replicate.com/sitemap-models.xml':
+            return 'not supported yet'
         print(f"[INFO] Parsing subsitemap: {subsitemap_url}")
         model_urls = parse_sitemap(subsitemap_url)
         for model_url in model_urls:
