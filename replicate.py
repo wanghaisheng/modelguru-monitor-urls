@@ -43,7 +43,9 @@ def get_model_runs(url):
         soup = BeautifulSoup(response.text, "html.parser")
         run_span = soup.find("span", class_="text-r8-sm")
         if run_span:
-            run_count = int(run_span.get_text(strip=True).lower().replace("runs", "").replace('public','').strip())
+            t =run_span.get_text(strip=True).lower().replace("runs", "").replace('public','').strip()
+            print('-----',t)
+            run_count=int(t)
             return run_count
         else:
             print(f"[WARNING] No run count found on page: {url}")
