@@ -45,11 +45,13 @@ def get_model_runs(url):
         if run_span:
             t =run_span.get_text(strip=True).lower()
             print('-----',t)
-            t=t.lower()
-            t=t.split('runs')[0]
             t=t.replace('public','')
+            
+            t=t.lower()
             if '\n' in t:
-                t.replace('\n','').strip()            
+                t.replace('\n','').strip()        
+            t=t.split('runs')[0]
+                
             if 'k' in t:
                 t=int(t.replace('k',''))*1000
             if 'm' in t:
