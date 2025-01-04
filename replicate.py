@@ -3,6 +3,7 @@ import requests
 import time
 from bs4 import BeautifulSoup
 from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -26,7 +27,7 @@ def parse_sitemap(url):
     try:
         response = requests.get(url)
         response.raise_for_status()
-        soup = BeautifulSoup(response.content, "xml")  # Requires lxml
+        soup = BeautifulSoup(response.content, "xml")
         return [loc.text for loc in soup.find_all("loc")]
     except requests.RequestException as e:
         print(f"[ERROR] Failed to fetch sitemap {url}: {e}")
@@ -43,25 +44,15 @@ def get_model_runs(url):
         soup = BeautifulSoup(response.text, "html.parser")
         run_span = soup.find("ul", class_="mt-3 flex gap-4 items-center flex-wrap")
         if run_span:
-            t =run_span.get_text(strip=True).lower()
-            print('-----',t)
-            t=t.replace('public','')
-            
-            t=t.lower()
-            if '\n' in t:
-                t.replace('\n','').strip()        
-            t=t.split('runs')[0]
-                
+            t = run_span.get_text(strip=True).lower()
+            t = t.replace('public', '').replace('\n', '').strip()
             if 'k' in t:
-                t=int(t.replace('k',''))*1000
-            if 'm' in t:
-                t=int(t.replace('m',''))*1000000
-                
-            print('mode url',url)
-            if t is None:
-                t=0
-            run_count=int(t)
-            return run_count
+                t = int(float(t.replace('k', '')) * 1000)
+            elif 'm' in t:
+                t = int(float(t.replace('m', '')) * 1000000)
+            else:
+                t = int(t)
+            return t
         else:
             print(f"[WARNING] No run count found on page: {url}")
             return None
@@ -98,7 +89,7 @@ def upsert_model_data(model_url, run_count):
     ON CONFLICT (model_url) DO UPDATE
     SET run_count = {run_count}, 
         updateAt = '{current_time}',
-        createAt = replicate_model_data.createAt; -- Preserve old createAt value
+        createAt = replicate_model_data.createAt;
     """
     payload = {"sql": sql}
     url = f"{CLOUDFLARE_BASE_URL}/query"
@@ -110,30 +101,37 @@ def upsert_model_data(model_url, run_count):
         print(f"[ERROR] Failed to upsert data for {model_url}: {e}")
 
 # Main workflow
+def process_model_url(model_url):
+    print(f"[INFO] Processing model: {model_url}")
+    run_count = get_model_runs(model_url)
+    if run_count is not None:
+        upsert_model_data(model_url, run_count)
+
 def main():
     print("[INFO] Starting sitemap parsing...")
     create_table_if_not_exists()
 
     # Parse the root sitemap
     subsitemaps = parse_sitemap(ROOT_SITEMAP_URL)
-    print('detected sitemap',subsitemaps)
     if not subsitemaps:
         print("[ERROR] No subsitemaps found.")
         return
 
-    # Process each subsitemap
     for subsitemap_url in subsitemaps:
-        if subsitemap_url!='https://replicate.com/sitemap-models.xml':
-            print( f'not supported yet:{subsitemap_url}')
+        if subsitemap_url != 'https://replicate.com/sitemap-models.xml':
+            print(f"[INFO] Skipping unsupported sitemap: {subsitemap_url}")
             continue
+
         print(f"[INFO] Parsing subsitemap: {subsitemap_url}")
         model_urls = parse_sitemap(subsitemap_url)
-        for model_url in model_urls:
-            print(f"[INFO] Processing model: {model_url}")
-            run_count = get_model_runs(model_url)
-            if run_count is not None:
-                upsert_model_data(model_url, run_count)
-            time.sleep(1)  # Avoid overloading the server
+
+        with ThreadPoolExecutor(max_workers=20) as executor:  # Adjust workers as needed
+            futures = [executor.submit(process_model_url, model_url) for model_url in model_urls]
+            for future in as_completed(futures):
+                try:
+                    future.result()
+                except Exception as e:
+                    print(f"[ERROR] Exception during processing: {e}")
 
     print("[INFO] Sitemap parsing complete.")
 
