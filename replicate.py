@@ -45,7 +45,12 @@ def get_model_runs(url):
         if run_span:
             t =run_span.get_text(strip=True).lower()
             print('-----',t)
-
+            t=t.split('runs')[0]
+            if 'k' in t:
+                t=int(t.replace('k',''))*1000
+            if 'm' in t:
+                t=int(t.replace('m',''))*1000000
+                
             t=t.replace("runs", "").replace('public','').replace('weights','').strip()
             t
             print('mode url',url)
