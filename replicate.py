@@ -43,9 +43,14 @@ def get_model_runs(url):
         soup = BeautifulSoup(response.text, "html.parser")
         run_span = soup.find("ul", class_="mt-3 flex gap-4 items-center flex-wrap")
         if run_span:
-            t =run_span.get_text(strip=True).lower().replace("runs", "").replace('public','').replace('weights','').strip()
+            t =run_span.get_text(strip=True).lower()
             print('-----',t)
+
+            t=t.replace("runs", "").replace('public','').replace('weights','').strip()
+            t
             print('mode url',url)
+            if '\n' in t:
+                t=t.split('\n')[0]
             if t is None:
                 t=0
             run_count=int(t)
