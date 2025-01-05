@@ -47,12 +47,13 @@ def get_model_runs(url):
         if run_span:
             t = run_span.get_text(strip=True).lower()
             t = t.replace('public', '').replace('\n', '').strip()
+            t=t.split('runs')[0].strip()
             if 'k' in t:
                 t = int(float(t.replace('k', '')) * 1000)
             elif 'm' in t:
                 t = int(float(t.replace('m', '')) * 1000000)
 
-            t=re.search(r'\d+', str(row['rank'])).group(0)
+            t=re.search(r'\d+', str(t)).group(0)
             
             t = int(t)
             return t
