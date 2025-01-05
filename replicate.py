@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dotenv import load_dotenv
+import re
 
 # Load environment variables
 load_dotenv()
@@ -50,8 +51,10 @@ def get_model_runs(url):
                 t = int(float(t.replace('k', '')) * 1000)
             elif 'm' in t:
                 t = int(float(t.replace('m', '')) * 1000000)
-            else:
-                t = int(t)
+
+            t=re.search(r'\d+', str(row['rank'])).group(0)
+            
+            t = int(t)
             return t
         else:
             print(f"[WARNING] No run count found on page: {url}")
