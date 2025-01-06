@@ -97,7 +97,7 @@ async def upsert_model_data(session, model_url, run_count):
         print('WaybackMachineCDXServerAPI failed')
     try:
 
-        cdx = cdx_toolkit.CDXFetcher(source='cc')
+        cdx = cdx_toolkit.CDXFetcher(source='cc-main-2018')
 
     
         for obj in cdx.iter(model_url, limit=1,cc_sort='ascending'):
