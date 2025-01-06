@@ -42,7 +42,7 @@ def collect_data_wayback(website_url,
     unique_articles_set = set()
     url_list = []
     #Define the search URL to query the Wayback Machine API
-    url = 'http://web.archive.org/cdx/search/cdx?url=https://www.' + website_url + '&collapse=digest&filter=!statuscode:404&showResumeKey=true&matchType=prefix&from=%s&to=%s&limit=%s&output=json'%(start_date,end_date,chunk_size)
+    url = 'http://web.archive.org/cdx/search/cdx?url=https://www.' + website_url + '&collapse=urlkey&filter=!statuscode:404&showResumeKey=true&matchType=prefix&from=%s&to=%s&limit=%s&output=json'%(start_date,end_date,chunk_size)
     if resume_key!='':
         #Resume from a certain point, if a resume key is provided
         url += '&resumeKey='+resume_key
@@ -56,6 +56,7 @@ def collect_data_wayback(website_url,
         ## Extracts timestamp and original columns from urls and compiles a url list.
         for i in range(1,len(parse_url)-2):
             orig_url = parse_url[i][2]
+            print('0000====',orig_url)
             if len(orig_url.lower().split(website_url)) > 1:
                 article_name = orig_url.lower().split(website_url)[1].split('/')[0].split('?')[0]
             else:
