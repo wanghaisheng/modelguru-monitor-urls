@@ -104,21 +104,21 @@ async def upsert_model_data(session, model_url, run_count,google_indexAt=None, m
     start_date = current_date - timedelta(days=365)
     start_date = int(start_date.strftime('%Y%m%d'))
     current_date = int(current_date.strftime('%Y%m%d'))
-
-    for t in ['cc','ia']:
-        if ccisopen==False and t=='cc':
-            continue
-        try:
-            cdx = cdx_toolkit.CDXFetcher(source=t)
-            for obj in cdx.iter(model_url, from_ts=start_date, to=current_date,limit=1, cc_sort='ascending'):
-                if t=='cc':
+    wayback_createAt=exact_url_timestamp(model_url)
+    # for t in ['cc','ia']:
+        # if ccisopen==False and t=='cc':
+            # continue
+        # try:
+            # cdx = cdx_toolkit.CDXFetcher(source=t)
+            # for obj in cdx.iter(model_url, from_ts=start_date, to=current_date,limit=1, cc_sort='ascending'):
+                # if t=='cc':
                 
-                    cc_createAt = obj.get('timestamp')
-                if t=='ia':
-                    wayback_createAt = obj.get('timestamp')
+                    # cc_createAt = obj.get('timestamp')
+                # if t=='ia':
+                    # wayback_createAt = obj.get('timestamp')
                 
-        except Exception as e:
-            print('t failed:', e)
+        # except Exception as e:
+            # print('t failed:', e)
 
     sql = f"""
     INSERT INTO huggingface_spaces_data (model_url, run_count, google_indexAt,wayback_createAt, cc_createAt, updateAt)
