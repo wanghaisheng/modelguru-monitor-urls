@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import re
 import aiohttp
-from collect_data_wayback import collect_data_wayback
+from collect_data_wayback import collect_data_wayback,exact_url_timestamp
 from waybackpy import WaybackMachineCDXServerAPI
 import cdx_toolkit
 from domainLatestUrl import DomainMonitor
