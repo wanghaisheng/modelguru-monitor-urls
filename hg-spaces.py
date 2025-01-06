@@ -132,7 +132,7 @@ async def main():
             if os.path.exists(file_path):
                 with open(file_path, encoding='utf8') as f:
                     model_urls = [line.strip() for line in f]
-
+        print('model_urls',model_urls)
         await asyncio.gather(*(process_model_url(semaphore, session, url) for url in model_urls))
 
         print("[INFO] Sitemap parsing complete.")
