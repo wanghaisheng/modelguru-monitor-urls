@@ -56,9 +56,10 @@ def collect_data_wayback(website_url,
         ## Extracts timestamp and original columns from urls and compiles a url list.
         for i in range(1,len(parse_url)-2):
             orig_url = parse_url[i][2]
+            print('0000====',parse_url[i])
+          
             if parse_url[i][4]!=200:
               continue
-            print('0000====',orig_url)
             if  orig_url not in unique_articles_set:
                 url_list.append(orig_url)
                 unique_articles_set.add(orig_url)
