@@ -57,7 +57,7 @@ def collect_data_wayback(website_url,
                 resume_key = new_resume_key
                 for i in range(1, len(parse_url) - 1):
                     # print('====',parse_url[i])
-                    if parse_url==['']:
+                    if len(parse_url)<5:
                       continue
                     orig_url = parse_url[i][2]
                     print('======',orig_url)
