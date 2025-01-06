@@ -32,7 +32,11 @@ def collect_data_wayback(website_url,
         chunk_size (int): the number of results to return per batch. 
         sleep (int): waiting time between API calls. 
     '''
-    
+    if 'http://' in website_url:
+        website_url=website_url.replace('http://','')
+    if 'https://' in website_url:
+        website_url=website_url.replace('https://','')
+      
     if chunk_size > max_count:
         return ValueError('Chunk size needs to be smaller than max count.')
     unique_articles_set = set()
