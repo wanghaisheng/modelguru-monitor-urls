@@ -56,7 +56,7 @@ def collect_data_wayback(website_url,
         ## Extracts timestamp and original columns from urls and compiles a url list.
         for i in range(1,len(parse_url)-2):
             orig_url = parse_url[i][2]
-            print('0000====',parse_url[i])
+            # print('0000====',parse_url[i])
           
             if parse_url[i][4]!='200':
               continue
