@@ -10,7 +10,7 @@ import aiohttp
 from collect_data_wayback import collect_data_wayback
 from waybackpy import WaybackMachineCDXServerAPI
 import cdx_toolkit
-
+from domain-latest-url import DomainMonitor
 # Load environment variables
 load_dotenv()
 
@@ -145,6 +145,7 @@ async def main():
         ROOT_SITEMAP_URL = f"{url_domain}/sitemap.xml"
         model_urls=[]
         model_urls = await parse_sitemap(session, ROOT_SITEMAP_URL)
+        print("[INFO] Sitemap parsing complete.")
 
         model_urls = list(set(model_urls))
         if not model_urls:
@@ -165,6 +166,8 @@ async def main():
                 # with open(file_path, encoding='utf8') as f:
                     # model_urls = [line.strip() for line in f]
         print('model_urls',len(model_urls))
+        print("[INFO] wayback check parsing complete.")
+        
         baseUrl='https://huggingface.co/spaces/'
         if len(model_urls)<1:
             retrun 
@@ -179,12 +182,21 @@ async def main():
 
             url=baseUrl+modelname[0]+'/'+modelname[1]
             cleanurls.append(url)
-        model_urls=list(set(cleanurls))[:10]
+        model_urls=list(set(cleanurls))
         print('cleanurls',len(model_urls))
+        
+        d=DomainMonitor()
+        results=d.monitor_site(site=baseUrl,time_range='24h')
+        if len(results)>1:
+            for r in results:
+                model_urls.append(r.get('url'))
+        model_urls=list(set(cleanurls))[:10]
+        print("[INFO] google search check  complete.")
         
         await asyncio.gather(*(process_model_url(semaphore, session, url) for url in model_urls))
 
         print("[INFO] Sitemap parsing complete.")
+
 
 if __name__ == "__main__":
     asyncio.run(main())
