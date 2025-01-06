@@ -138,7 +138,7 @@ async def main():
         if len(model_urls)<1:
             retrun 
         cleanurls=[]
-        for url in model_urls
+        for url in model_urls:
 
             modelname=url.replace(baseUrl,'').split('/')
             if len(modelname)<2:
