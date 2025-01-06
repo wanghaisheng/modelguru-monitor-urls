@@ -84,11 +84,21 @@ async def upsert_model_data(session, model_url, run_count):
     print('try to find first index date of ',model_url)
     user_agent = "check huggignface model's user agent"
     createAt=current_time
-    cdx_api = WaybackMachineCDXServerAPI(model_url, user_agent)
-    oldest = cdx_api.oldest()
-    if oldest.datetime_timestamp:
-        createAt =oldest.datetime_timestamp.isoformat()
-    print('===',createAt)
+    try:
+        cdx_api = WaybackMachineCDXServerAPI(model_url, user_agent)
+        oldest = cdx_api.oldest()
+        if oldest.datetime_timestamp:
+            createAt =oldest.datetime_timestamp.isoformat()
+        print('==WaybackMachineCDXServerAPI=',createAt)
+    except:
+        print('WaybackMachineCDXServerAPI failed, check commoncrawl')
+        import cdx_toolkit
+
+        cdx = cdx_toolkit.CDXFetcher(source='cc')
+
+    
+        for obj in cdx.iter(model_url, limit=1,cc_sort='ascending'):
+            creaeAt=timestamp
     
 
     
