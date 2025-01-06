@@ -47,6 +47,7 @@ def collect_data_wayback(website_url,
                     progress_bar.close()
                     return url_list
                 
+                # Update resume_key and URL for the next batch
                 new_resume_key = parse_url[-1][0] if parse_url[-1][0] != resume_key else ''
                 if not new_resume_key:
                     print("No progress detected with resume key. Exiting loop.")
@@ -54,7 +55,7 @@ def collect_data_wayback(website_url,
                     return url_list
                 
                 resume_key = new_resume_key
-                for i in range(1, len(parse_url) - 2):
+                for i in range(1, len(parse_url) - 1):
                     orig_url = parse_url[i][2]
                     if parse_url[i][4] != '200':
                         continue
@@ -75,6 +76,12 @@ def collect_data_wayback(website_url,
                     return url_list
 
         progress_bar.update(1)
+
+        # Check if the loop should terminate after fetching all data
+        if len(url_list) >= max_count:
+            print("Reached maximum count of URLs.")
+            progress_bar.close()
+            break
 
     progress_bar.close()
     print('urls count', len(url_list))
