@@ -41,11 +41,6 @@ async def parse_sitemap(session, url):
 async def get_model_runs(session, url):
     try:
         # https://huggingface.co/spaces/AP123/IllusionDiffusion/discussions/94
-        baseUrl='https://huggingface.co/spaces/'
-        modelname=url.replace(baseUrl,'').split('/')
-        if len(modelname)<2:
-            continue
-        url=baseUrl+modelname[0]+'/'+modelname[1]
         async with session.get(url) as response:
             response.raise_for_status()
             soup = BeautifulSoup(await response.text(), "html.parser")
@@ -139,6 +134,19 @@ async def main():
                 # with open(file_path, encoding='utf8') as f:
                     # model_urls = [line.strip() for line in f]
         print('model_urls',model_urls)
+        baseUrl='https://huggingface.co/spaces/'
+        if len(model_urls)<1:
+            retrun 
+        cleanurls=[]
+        for url in model_urls
+
+            modelname=url.replace(baseUrl,'').split('/')
+            if len(modelname)<2:
+                continue
+
+            url=baseUrl+modelname[0]+'/'+modelname[1]
+            cleanurls.append(url)
+        model_urls=list(set(cleanurls))
         await asyncio.gather(*(process_model_url(semaphore, session, url) for url in model_urls))
 
         print("[INFO] Sitemap parsing complete.")
