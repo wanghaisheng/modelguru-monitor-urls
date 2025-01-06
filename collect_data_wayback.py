@@ -60,6 +60,8 @@ def collect_data_wayback(website_url,
                     if len(parse_url)!=7:
                       continue
                     orig_url = parse_url[i][2]
+                    print('======',orig_url)
+
                     if parse_url[i][4] != '200':
                         continue
                     if orig_url not in unique_articles_set:
