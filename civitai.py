@@ -114,7 +114,6 @@ async def upsert_model_data(model_url, stats, type, session):
         createAt = civitai_model_data.createAt;
     """
     payload = {"sql": sql}
-    print('insert data',sql)
     
     url = f"{CLOUDFLARE_BASE_URL}/query"
     try:
@@ -122,6 +121,8 @@ async def upsert_model_data(model_url, stats, type, session):
             response.raise_for_status()
             print(f"[INFO] Data upserted for {model_url} with {run_count} runs.")
     except aiohttp.ClientError as e:
+        print('insert data',sql)
+        
         print(f"[ERROR] Failed to upsert data for {model_url}: {e}")
 
 # Main workflow
