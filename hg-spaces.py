@@ -140,7 +140,8 @@ async def main():
         cleanurls=[]
         print('start clean url')
         for url in model_urls:
-
+            if '?' in url:
+                url=url.split('?')[0]
             modelname=url.replace(baseUrl,'').split('/')
             if len(modelname)<2:
                 continue
