@@ -47,18 +47,17 @@ async def get_model_runs(url, session):
                 response.raise_for_status()
                 text = await response.text()
                 soup = BeautifulSoup(text, "html.parser")
-                run_spans = soup.findall("tr", class_="mantine-1avyp1d")
-                if run_spans and len(run_spans)>2:
-                    run_span=run_spans[1]
-                    
+                run_spans = soup.find_all("tr", class_="mantine-1avyp1d")
+                if run_spans and len(run_spans) > 2:
+                    run_span = run_spans[1]
                     t = run_span.get_text(strip=True).lower()
-                    print('stats',t)
+                    print('stats', t)
                     if 'k' in t:
                         t = int(float(t.replace('k', '')) * 1000)
                     elif 'm' in t:
                         t = int(float(t.replace('m', '')) * 1000000)
                     if ',' in t:
-                        t=t.replace(',','')
+                        t = t.replace(',', '')
                     t = int(t)
                     return t
                 else:
@@ -76,7 +75,6 @@ async def create_table_if_not_exists(session):
         model_url TEXT UNIQUE,
         run_count INTEGER,
         type TEXT,
-
         createAt TEXT,
         updateAt TEXT
     );
@@ -91,11 +89,11 @@ async def create_table_if_not_exists(session):
         print(f"[ERROR] Failed to create table: {e}")
 
 # Helper: Insert or update model data
-async def upsert_model_data(model_url, run_count,type, session):
+async def upsert_model_data(model_url, run_count, type, session):
     current_time = datetime.utcnow().isoformat()
     sql = f"""
-    INSERT INTO civitai_model_data (model_url, run_count,type, createAt, updateAt)
-    VALUES ('{model_url}', {run_count},'{type}', '{current_time}', '{current_time}')
+    INSERT INTO civitai_model_data (model_url, run_count, type, createAt, updateAt)
+    VALUES ('{model_url}', {run_count}, '{type}', '{current_time}', '{current_time}')
     ON CONFLICT (model_url) DO UPDATE
     SET run_count = {run_count}, 
         updateAt = '{current_time}',
@@ -111,11 +109,11 @@ async def upsert_model_data(model_url, run_count,type, session):
         print(f"[ERROR] Failed to upsert data for {model_url}: {e}")
 
 # Main workflow
-async def process_model_url(model_url,type, session):
+async def process_model_url(model_url, type, session):
     print(f"[INFO] Processing model: {model_url}")
     run_count = await get_model_runs(model_url, session)
     if run_count is not None:
-        await upsert_model_data(model_url, run_count,type, session)
+        await upsert_model_data(model_url, run_count, type, session)
 
 async def main():
     print("[INFO] Starting sitemap parsing...")
@@ -130,17 +128,14 @@ async def main():
 
         tasks = []
         for subsitemap_url in subsitemaps:
-            type=subsitemap_url.replace('https://civitai.com/sitemap-','')
-            type=type.replace('.xml','')
-            if len(type)==1:
-                continue
-            if type!='models':
+            type = subsitemap_url.replace('https://civitai.com/sitemap-', '').replace('.xml', '')
+            if len(type) == 1 or type != 'models':
                 continue
             print(f"[INFO] Parsing subsitemap: {subsitemap_url}")
             model_urls = await parse_sitemap(subsitemap_url, session)
 
             for model_url in model_urls:
-                tasks.append(process_model_url(model_url,type, session))
+                tasks.append(process_model_url(model_url, type, session))
 
         await asyncio.gather(*tasks)
     print("[INFO] Sitemap parsing complete.")
