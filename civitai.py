@@ -111,7 +111,7 @@ async def upsert_model_data(model_url, run_count,type, session):
         print(f"[ERROR] Failed to upsert data for {model_url}: {e}")
 
 # Main workflow
-async def process_model_url(model_url,typem session):
+async def process_model_url(model_url,type, session):
     print(f"[INFO] Processing model: {model_url}")
     run_count = await get_model_runs(model_url, session)
     if run_count is not None:
