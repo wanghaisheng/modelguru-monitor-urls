@@ -1,0 +1,29 @@
+# *
+User-agent: *
+Allow: /api/trpc/*
+Disallow: /*/create
+Disallow: /api/*
+Disallow: /discord/*
+Disallow: /dmca/*
+Disallow: /intent/*
+Disallow: /models/train
+Disallow: /moderator/*
+Disallow: /payment/*
+Disallow: /redirect
+Disallow: /search/*
+Disallow: /testing/*
+Disallow: /user/account
+Disallow: /user/downloads
+Disallow: /user/notifications
+Disallow: /user/transactions
+Disallow: /user/buzz-dashboard
+Disallow: /user/vault
+
+# Host
+Host: https://civitai.com
+
+# Sitemaps
+Sitemap: https://civitai.com/sitemap.xml
+Sitemap: https://civitai.com/sitemap-articles.xml
+Sitemap: https://civitai.com/sitemap-models.xml
+Sitemap: https://civitai.com/sitemap-tools.xml
