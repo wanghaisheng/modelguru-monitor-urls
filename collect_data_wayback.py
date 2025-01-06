@@ -7,8 +7,6 @@ import argparse
 import re
 import sys
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
-from utils import *
-from dataset_collection.scrape_utils import *
 
 
 def collect_data_wayback(website_url,
@@ -119,13 +117,13 @@ if __name__=='__main__':
     #Remove non-English and non-images FC article URLs
     search_words= ["photo", "image", "picture"]
     pattern = r'(?:' + '|'.join(search_words) + r')'
-    urls = [u for u in load_urls(args.file_path) if is_english_article(u) and re.search(pattern,u)]
+    # urls = [u for u in load_urls(args.file_path) if is_english_article(u) and re.search(pattern,u)]
     #Remove the wayback machine part of the URL
-    original_urls = ['/'.join(u.split('/')[5:]) for u in urls] 
+    # original_urls = ['/'.join(u.split('/')[5:]) for u in urls] 
     #Scrape the article content and the images
-    collect_articles(original_urls,args.parser,args.scrape_image,args.sleep)
+    # collect_articles(original_urls,args.parser,args.scrape_image,args.sleep)
     #Process the images
-    if args.process_image:
-        if not 'processed_img' in os.listdir('dataset/'):
-            os.mkdir('dataset/processed_img/')
-        process_images_from_instructions(args.image_processing_script, 'dataset/img/', 'dataset/processed_img/')
+    # if args.process_image:
+        # if not 'processed_img' in os.listdir('dataset/'):
+            # os.mkdir('dataset/processed_img/')
+        # process_images_from_instructions(args.image_processing_script, 'dataset/img/', 'dataset/processed_img/')
