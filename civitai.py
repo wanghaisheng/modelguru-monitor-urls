@@ -140,7 +140,7 @@ async def main():
             model_urls = await parse_sitemap(subsitemap_url, session)
 
             for model_url in model_urls:
-                tasks.append(process_model_url(model_url,tpye, session))
+                tasks.append(process_model_url(model_url,type, session))
 
         await asyncio.gather(*tasks)
     print("[INFO] Sitemap parsing complete.")
