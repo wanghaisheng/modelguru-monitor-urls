@@ -58,7 +58,6 @@ async def get_model_runs(url, session):
                     for run_span in spans:
                         
                         t = run_span.get_text(strip=True).lower()
-                        print('stats', t)
                         t=t.replace('stats','').strip()
                         if 'k' in t:
                             t = int(float(t.replace('k', '')) * 1000)
@@ -66,8 +65,11 @@ async def get_model_runs(url, session):
                             t = int(float(t.replace('m', '')) * 1000000)
                         if ',' in t:
                             t = t.replace(',', '')
+                            
                         t = int(t)
                         stats.append(t)
+                    print('stats', stats)
+                    
                     return stats
                 else:
                     print(f"[WARNING] No run count found on page: {url}")
@@ -112,6 +114,8 @@ async def upsert_model_data(model_url, stats, type, session):
         createAt = civitai_model_data.createAt;
     """
     payload = {"sql": sql}
+    print('insert data',sql)
+    
     url = f"{CLOUDFLARE_BASE_URL}/query"
     try:
         async with session.post(url, headers=HEADERS, json=payload) as response:
