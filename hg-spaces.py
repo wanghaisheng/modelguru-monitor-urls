@@ -9,6 +9,7 @@ import re
 import aiohttp
 from collect_data_wayback import collect_data_wayback
 from waybackpy import WaybackMachineCDXServerAPI
+import cdx_toolkit
 
 # Load environment variables
 load_dotenv()
@@ -68,7 +69,8 @@ async def create_table_if_not_exists(session):
         id SERIAL PRIMARY KEY,
         model_url TEXT UNIQUE,
         run_count INTEGER,
-        createAt TEXT,
+        wayback_createAt TEXT,
+        cc_createAt TEXT,
         updateAt TEXT
     );
     """
@@ -83,28 +85,31 @@ async def upsert_model_data(session, model_url, run_count):
     current_time = datetime.utcnow().isoformat()
     print('try to find first index date of ',model_url)
     user_agent = "check huggignface model's user agent"
-    createAt=current_time
+    wayback_createAt=None
+    cc_createAt=None    
     try:
         cdx_api = WaybackMachineCDXServerAPI(model_url, user_agent)
         oldest = cdx_api.oldest()
         if oldest.datetime_timestamp:
-            createAt =oldest.datetime_timestamp.isoformat()
+            wayback_createAt =oldest.datetime_timestamp.isoformat()
         print('==WaybackMachineCDXServerAPI=',createAt)
     except:
-        print('WaybackMachineCDXServerAPI failed, check commoncrawl')
-        import cdx_toolkit
+        print('WaybackMachineCDXServerAPI failed')
+    try:
 
         cdx = cdx_toolkit.CDXFetcher(source='cc')
 
     
         for obj in cdx.iter(model_url, limit=1,cc_sort='ascending'):
-            creaeAt=timestamp
-    
+            cc_createAt=timestamp
+    except:
+        print('commoncrawl failed')
+        
 
     
     sql = f"""
-    INSERT INTO huggingface_spaces_data (model_url, run_count, createAt, updateAt)
-    VALUES ('{model_url}', {run_count}, '{createAt}', '{current_time}')
+    INSERT INTO huggingface_spaces_data (model_url, run_count, wayback_createAt,cc_createAt, updateAt)
+    VALUES ('{model_url}', {run_count},'wayback_createAt', '{cc_createAt}', '{current_time}')
     ON CONFLICT (model_url) DO UPDATE
     SET run_count = {run_count}, 
         updateAt = '{current_time}',
