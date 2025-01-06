@@ -103,10 +103,12 @@ async def upsert_model_data(session, model_url, run_count,google_indexAt=None, m
     current_date = datetime.now()
     start_date = current_date - timedelta(days=365)
     start_date = int(start_date.strftime('%Y%m%d'))
+    current_date = int(current_date.strftime('%Y%m%d'))
+
     for t in ['cc','ia']:
         try:
             cdx = cdx_toolkit.CDXFetcher(source='cc')
-            for obj in cdx.iter(model_url, from_ts=start_date, limit=1, cc_sort='ascending'):
+            for obj in cdx.iter(model_url, from_ts=start_date, to=current_date,limit=1, cc_sort='ascending'):
                 if t=='cc':
                 
                     cc_createAt = obj.get('timestamp')
