@@ -77,6 +77,7 @@ def collect_data_wayback(website_url,
                     print(f"Failed to fetch data after {retries} attempts. Error: {e}")
                     progress_bar.close()
                     return url_list
+        print('current url',len(url_list))
 
         progress_bar.update(1)
 
