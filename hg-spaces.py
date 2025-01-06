@@ -194,7 +194,7 @@ async def main():
         if len(results)>1:
             for r in results:
                 model_urls.append(r.get('url'))
-        model_urls=list(set(cleanurls))[:10]
+        model_urls=list(set(cleanurls))
         print("[INFO] google search check  complete.")
         
         await asyncio.gather(*(process_model_url(semaphore, session, url) for url in model_urls))
