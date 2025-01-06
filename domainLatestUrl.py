@@ -40,9 +40,10 @@ class DomainMonitor:
         try:
             with open(filename, 'r', encoding='utf-8') as f:
                 return [line.strip() for line in f if line.strip()]
+                
         except FileNotFoundError:
-            raise Exception(f"Sites file {filename} not found!")
-
+            print(f"Sites file {filename} not found!")
+            return []
     def build_google_search_url(self, site, time_range):
         """
         构建Google搜索URL
@@ -157,7 +158,9 @@ class DomainMonitor:
             time_ranges = ['24h', '1w']
             
         all_results = []
-        
+        if len(self.sites)==0:
+            print('please provide sites')
+            return 
         for site in self.sites:
             for time_range in time_ranges:
                 results = self.monitor_site(site, time_range)
