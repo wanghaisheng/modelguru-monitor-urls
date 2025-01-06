@@ -99,6 +99,8 @@ import random
 
 # Load SOCKS5 proxies from a URL (or you can load from a file if you prefer)
 def load_proxies(url):
+    if url is None:
+      url='https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/socks5.txt'
     try:
         response = rq.get(url)
         response.raise_for_status()
