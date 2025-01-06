@@ -51,7 +51,7 @@ def collect_data_wayback(website_url,
         #Main loop : cycle until we collect sufficient articles
         result_urls = rq.get(url).text
         parse_url = json.loads(result_urls) #parses the JSON from urls.
-        print('=======get url====',url,parse_url)
+        # print('=======get url====',url,parse_url)
         resume_key = parse_url[-1][0]
         ## Extracts timestamp and original columns from urls and compiles a url list.
         for i in range(1,len(parse_url)-2):
