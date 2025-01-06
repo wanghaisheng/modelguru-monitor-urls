@@ -121,7 +121,7 @@ async def main():
             start_date = current_date - timedelta(days=365)
             file_path = 'hg.txt'
             collect_data_wayback(
-                url_domain,
+                url_domain+'/spaces/',
                 file_path,
                 start_date=int(start_date.strftime('%Y%m%d')),
                 end_date=int(current_date.strftime('%Y%m%d')),
