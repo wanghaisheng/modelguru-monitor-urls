@@ -109,7 +109,7 @@ async def upsert_model_data(session, model_url, run_count,google_indexAt=None, m
         if ccisopen==False and t=='cc':
             continue
         try:
-            cdx = cdx_toolkit.CDXFetcher(source='cc')
+            cdx = cdx_toolkit.CDXFetcher(source=t)
             for obj in cdx.iter(model_url, from_ts=start_date, to=current_date,limit=1, cc_sort='ascending'):
                 if t=='cc':
                 
