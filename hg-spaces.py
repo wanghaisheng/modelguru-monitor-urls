@@ -89,25 +89,33 @@ async def upsert_model_data_withoutretry(session, model_url, run_count):
     wayback_createAt = None
     cc_createAt = None    
 
-    try:
-        cdx_api = WaybackMachineCDXServerAPI(model_url, user_agent)
-        oldest = cdx_api.oldest()
-        if oldest.datetime_timestamp:
-            wayback_createAt = oldest.datetime_timestamp.isoformat()
-        print('==WaybackMachineCDXServerAPI=', wayback_createAt)
-    except Exception as e:
-        print('WaybackMachineCDXServerAPI failed:', e)
+    # try:
+        # cdx_api = WaybackMachineCDXServerAPI(model_url, user_agent)
+        # oldest = cdx_api.oldest()
+        # if oldest.datetime_timestamp:
+            # wayback_createAt = oldest.datetime_timestamp.isoformat()
+        # print('==WaybackMachineCDXServerAPI=', wayback_createAt)
+    # except Exception as e:
+        # print('WaybackMachineCDXServerAPI failed:', e)
 
     # Common Crawl fetching logic (commented out in your example)
     current_date = datetime.now()
     start_date = current_date - timedelta(days=365)
     start_date=int(start_date.strftime('%Y%m%d')),
-    if ccisopen:
+    # if ccisopen:
+    for t in ['cc','ia']:
+        if ccisopen==False and t=='cc':
+            continue
+        
 
         try:
-            cdx = cdx_toolkit.CDXFetcher(source='cc')
+            cdx = cdx_toolkit.CDXFetcher(source=t)
             for obj in cdx.iter(model_url,from_ts=start_date, limit=1, cc_sort='ascending'):
-                cc_createAt = obj.get('timestamp')
+                if t=='cc':
+                    cc_createAt = obj.get('timestamp')
+                if t=='ia':
+                    wayback_createAt = obj.get('timestamp')
+                    
         except Exception as e:
             print('commoncrawl failed:', e)
 
@@ -258,7 +266,7 @@ async def main():
         if len(results)>1:
             for r in results:
                 model_urls.append(r.get('url'))
-        model_urls=list(set(cleanurls))
+        model_urls=list(set(cleanurls))[:10]
         print("[INFO] google search check  complete.")
         
         await asyncio.gather(*(process_model_url(semaphore, session, url) for url in model_urls))
