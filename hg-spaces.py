@@ -177,7 +177,7 @@ async def main():
 
             url=baseUrl+modelname[0]+'/'+modelname[1]
             cleanurls.append(url)
-        model_urls=list(set(cleanurls))
+        model_urls=list(set(cleanurls))[:10]
         print('cleanurls',len(model_urls))
         
         await asyncio.gather(*(process_model_url(semaphore, session, url) for url in model_urls))
