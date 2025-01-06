@@ -95,15 +95,15 @@ async def upsert_model_data(session, model_url, run_count):
         print('==WaybackMachineCDXServerAPI=',createAt)
     except:
         print('WaybackMachineCDXServerAPI failed')
-    try:
+    # try:
 
-        cdx = cdx_toolkit.CDXFetcher(source='cc')
+        # cdx = cdx_toolkit.CDXFetcher(source='cc')
 
     
-        for obj in cdx.iter(model_url, limit=1,cc_sort='ascending'):
-            cc_createAt=timestamp
-    except:
-        print('commoncrawl failed')
+        # for obj in cdx.iter(model_url, limit=1,cc_sort='ascending'):
+            # cc_createAt=timestamp
+    # except:
+        # print('commoncrawl failed')
         
 
     
