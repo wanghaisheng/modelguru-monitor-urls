@@ -188,7 +188,7 @@ async def main():
                 start_date=int(start_date.strftime('%Y%m%d')),
                 end_date=int(current_date.strftime('%Y%m%d')),
                 max_count=5000,
-                chunk_size=4000,
+                chunk_size=1000,
                 sleep=5
             )
             # if os.path.exists(file_path):
