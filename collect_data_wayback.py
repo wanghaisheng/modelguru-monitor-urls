@@ -1,11 +1,10 @@
 import requests as rq
 import time
-import json
-from tqdm import tqdm
 import os
 import argparse
-import re
 import sys
+from tqdm import tqdm
+
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
 def collect_data_wayback(website_url,
@@ -17,6 +16,22 @@ def collect_data_wayback(website_url,
                          chunk_size=100,
                          sleep=3,
                          retries=5):
+    '''
+    Collect all urls matching a specific domain on the Wayback machine.
+    All archived urls between a specified start date and end date are returned in alphabetical order.
+    It is important to not overload the API by keeping the chunk_size parameter reasonably low, 
+    and waiting for a few seconds between each API call.
+    Params:
+        website_url (str): the url domain. All urls matching that domain will be searched on the Wayback machine.
+        output_dir (str): the path to the file where the retrieved urls are stored.
+        start_date (int): results archived from that date will be returned. Format: YYYYMMDD
+        end_date (int): results archived up to that date will be returned. Format: YYYYMMDD
+        resume_key (str): if not all urls have been returned in the previous iteration, the resume key allows to start from the last url retrieved.
+        max_count (int): the maximum number of results to be returned.
+        chunk_size (int): the number of results to return per batch.
+        sleep (int): waiting time between API calls.
+        retries (int): number of retry attempts for failed API calls.
+    '''
     if 'http://' in website_url:
         website_url = website_url.replace('http://', '')
     if 'https://' in website_url:
@@ -34,7 +49,9 @@ def collect_data_wayback(website_url,
         url += '&resumeKey=' + resume_key
     
     its = max_count // chunk_size
-    for _ in tqdm(range(its)):
+    progress_bar = tqdm(total=its)
+    
+    for _ in range(its):
         for attempt in range(retries):
             try:
                 result = rq.get(url)
@@ -43,12 +60,14 @@ def collect_data_wayback(website_url,
 
                 if len(parse_url) < 2:
                     print("No more data to fetch.")
+                    progress_bar.close()
                     return url_list
                 
                 # Extracting new resume_key
                 new_resume_key = parse_url[-1][0] if parse_url[-1][0] != resume_key else ''
                 if not new_resume_key:
                     print("No progress detected with resume key. Exiting loop.")
+                    progress_bar.close()
                     return url_list
                 
                 resume_key = new_resume_key
@@ -70,8 +89,12 @@ def collect_data_wayback(website_url,
                     continue
                 else:
                     print(f"Failed to fetch data after {retries} attempts. Error: {e}")
+                    progress_bar.close()
                     return url_list
 
+        progress_bar.update(1)
+
+    progress_bar.close()
     print('urls count', len(url_list))
     print('Collected %s of the initial number of requested urls' % (round(len(url_list) / max_count, 2)))
     return url_list
