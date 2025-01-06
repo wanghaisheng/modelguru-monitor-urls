@@ -133,11 +133,12 @@ async def main():
             # if os.path.exists(file_path):
                 # with open(file_path, encoding='utf8') as f:
                     # model_urls = [line.strip() for line in f]
-        print('model_urls',model_urls)
+        print('model_urls',len(model_urls))
         baseUrl='https://huggingface.co/spaces/'
         if len(model_urls)<1:
             retrun 
         cleanurls=[]
+        print('start clean url')
         for url in model_urls:
 
             modelname=url.replace(baseUrl,'').split('/')
@@ -147,6 +148,8 @@ async def main():
             url=baseUrl+modelname[0]+'/'+modelname[1]
             cleanurls.append(url)
         model_urls=list(set(cleanurls))
+        print('cleanurls',len(model_urls))
+        
         await asyncio.gather(*(process_model_url(semaphore, session, url) for url in model_urls))
 
         print("[INFO] Sitemap parsing complete.")
