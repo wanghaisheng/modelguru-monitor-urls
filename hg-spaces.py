@@ -98,9 +98,13 @@ async def upsert_model_data(session, model_url, run_count):
         print('WaybackMachineCDXServerAPI failed:', e)
 
     # Common Crawl fetching logic (commented out in your example)
+    current_date = datetime.now()
+    start_date = current_date - timedelta(days=365)
+    start_date=int(start_date.strftime('%Y%m%d')),
+
     try:
         cdx = cdx_toolkit.CDXFetcher(source='cc')
-        for obj in cdx.iter(model_url,from_ts=20240101093620 limit=1, cc_sort='ascending'):
+        for obj in cdx.iter(model_url,from_ts=start_date limit=1, cc_sort='ascending'):
             cc_createAt = obj.get('timestamp')
     except Exception as e:
         print('commoncrawl failed:', e)
