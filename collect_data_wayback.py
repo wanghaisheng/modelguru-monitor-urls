@@ -58,7 +58,7 @@ def collect_data_wayback(website_url,
             orig_url = parse_url[i][2]
             print('0000====',parse_url[i])
           
-            if parse_url[i][4]!=200:
+            if parse_url[i][4]!='200':
               continue
             if  orig_url not in unique_articles_set:
                 url_list.append(orig_url)
