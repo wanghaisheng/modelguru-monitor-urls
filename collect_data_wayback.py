@@ -156,10 +156,10 @@ def exact_url_timestamp(website_url,
                         if len(parse_url[i]) < 5:
                             continue
                         orig_url = parse_url[i][2]
-                        print('======', orig_url)
                         indexdate = parse_url[i][6]
                         url_list.append(orig_url)
                         url_list.append(indexdate)
+                        print('======', url_list)
                       
                     break  # Exit proxy retry loop if successful
                 except (rq.RequestException, ValueError) as e:
