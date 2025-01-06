@@ -67,7 +67,7 @@ def collect_data_wayback(website_url,
         time.sleep(sleep)     
 
     # save the url list as a txt file if they match the keywords
-
+    print('urls count',len(url_list))
     print('Collected %s of the initial number of requested urls'%(round(len(url_list)/max_count,2)))
     # with open(output_dir, 'a') as file:
         # for item in url_list:
