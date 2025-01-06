@@ -68,12 +68,12 @@ def collect_data_wayback(website_url,
     # save the url list as a txt file if they match the keywords
 
     print('Collected %s of the initial number of requested urls'%(round(len(url_list)/max_count,2)))
-    with open(output_dir, 'a') as file:
-        for item in url_list:
-                file.write(str(item) + '\n')
-        file.write(resume_key)
-    print('Last article : ' + url_list[-1].split('/')[-2] + '/' + url_list[-1].split('/')[-1])
-    print('Enter resume key if you want to continue.')
+    # with open(output_dir, 'a') as file:
+        # for item in url_list:
+                # file.write(str(item) + '\n')
+        # file.write(resume_key)
+    # print('Last article : ' + url_list[-1].split('/')[-2] + '/' + url_list[-1].split('/')[-1])
+    # print('Enter resume key if you want to continue.')
     return url_list
     # return resume_key
 
