@@ -111,6 +111,8 @@ async def process_model_url(semaphore, session, model_url):
     async with semaphore:
         print(f"[INFO] Processing model: {model_url}")
         run_count = await get_model_runs(session, model_url)
+        print(f"[INFO] save statics: {run_count}")
+        
         if run_count is not None:
             await upsert_model_data(session, model_url, run_count)
 
