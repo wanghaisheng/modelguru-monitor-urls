@@ -101,7 +101,7 @@ async def upsert_model_data(session, model_url, run_count):
     try:
         cdx = cdx_toolkit.CDXFetcher(source='cc')
         for obj in cdx.iter(model_url, limit=1, cc_sort='ascending'):
-            cc_createAt = obj.timestamp
+            cc_createAt = obj.get('timestamp')
     except Exception as e:
         print('commoncrawl failed:', e)
 
