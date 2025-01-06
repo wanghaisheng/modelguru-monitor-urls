@@ -59,6 +59,7 @@ async def get_model_runs(url, session):
                         
                         t = run_span.get_text(strip=True).lower()
                         print('stats', t)
+                        t=t.replace('stats','').strip()
                         if 'k' in t:
                             t = int(float(t.replace('k', '')) * 1000)
                         elif 'm' in t:
