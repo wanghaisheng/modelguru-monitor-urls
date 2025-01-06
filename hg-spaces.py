@@ -25,7 +25,7 @@ HEADERS = {
 }
 
 # Concurrency limit
-SEM_LIMIT = 100
+SEM_LIMIT = 50
 
 # Helper: Parse a sitemap and return all <loc> URLs
 async def parse_sitemap(session, url):
