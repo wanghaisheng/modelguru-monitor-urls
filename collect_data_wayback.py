@@ -86,4 +86,24 @@ if __name__ == '__main__':
     parser.add_argument('--url_domain', type=str, default='factly.in/', 
                         help='The domain to query on the Wayback Machine API. factly.in/, 211check.org/, or pesacheck.org/')
     parser.add_argument('--file_path', type=str, default='dataset/url/factly.txt',
-                        help='Path to the file that stores the URLs
+                        help='Path to the file that stores the URLs')
+    parser.add_argument('--start_date', type=int, default=20190101,
+                        help='Start date for the collection of URLs.')
+    parser.add_argument('--end_date', type=int, default=20231231,
+                        help='End date for the collection of URLs.')
+    parser.add_argument('--max_count', type=int, default=20000,
+                        help='Maximum number of URLs to collect.')
+    parser.add_argument('--chunk_size', type=int, default=4000,
+                        help='Size of each chunk to query the Wayback Machine API.')
+    parser.add_argument('--sleep', type=int, default=5,
+                        help='Waiting time between two calls of the Wayback machine API.')
+
+    args = parser.parse_args()
+
+    collect_data_wayback(args.url_domain,
+                         args.file_path,
+                         start_date=args.start_date,
+                         end_date=args.end_date,
+                         max_count=args.max_count,
+                         chunk_size=args.chunk_size,
+                         sleep=args.sleep)
