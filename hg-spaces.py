@@ -70,6 +70,7 @@ async def create_table_if_not_exists(session):
         id SERIAL PRIMARY KEY,
         model_url TEXT UNIQUE,
         run_count INTEGER,
+        google_indexAt TEXT,
         wayback_createAt TEXT,
         cc_createAt TEXT,
         updateAt TEXT
@@ -81,10 +82,11 @@ async def create_table_if_not_exists(session):
         response.raise_for_status()
         print("[INFO] Table huggingface_spaces_data checked/created successfully.")
 
-# Helper: Insert or update model data
-async def upsert_model_data_withoutretry(session, model_url, run_count):
+
+# Helper: Insert or update model data with retry and exception handling
+async def upsert_model_data(session, model_url, run_count,google_indexAt=None, max_retries=3, retry_delay=5):
     current_time = datetime.utcnow().isoformat()
-    print('try to find first index date of ', model_url)
+    print('Try to find first index date of', model_url)
     user_agent = "check huggingface model's user agent"
     wayback_createAt = None
     cc_createAt = None    
@@ -98,83 +100,34 @@ async def upsert_model_data_withoutretry(session, model_url, run_count):
     # except Exception as e:
         # print('WaybackMachineCDXServerAPI failed:', e)
 
-    # Common Crawl fetching logic (commented out in your example)
-    current_date = datetime.now()
-    start_date = current_date - timedelta(days=365)
-    start_date=int(start_date.strftime('%Y%m%d')),
-    # if ccisopen:
-    for t in ['cc','ia']:
-        if ccisopen==False and t=='cc':
-            continue
-        
-
-        try:
-            cdx = cdx_toolkit.CDXFetcher(source=t)
-            for obj in cdx.iter(model_url,from_ts=start_date, limit=1, cc_sort='ascending'):
-                if t=='cc':
-                    cc_createAt = obj.get('timestamp')
-                if t=='ia':
-                    wayback_createAt = obj.get('timestamp')
-                    
-        except Exception as e:
-            print('commoncrawl failed:', e)
-
-    sql = f"""
-    INSERT INTO huggingface_spaces_data (model_url, run_count, wayback_createAt, cc_createAt, updateAt)
-    VALUES ('{model_url}', {run_count}, 
-            {f"'{wayback_createAt}'" if wayback_createAt else 'NULL'}, 
-            {f"'{cc_createAt}'" if cc_createAt else 'NULL'}, 
-            '{current_time}')
-    ON CONFLICT (model_url) DO UPDATE
-    SET run_count = {run_count}, 
-        updateAt = '{current_time}',
-        wayback_createAt = COALESCE(huggingface_spaces_data.wayback_createAt, EXCLUDED.wayback_createAt),
-        cc_createAt = COALESCE(huggingface_spaces_data.cc_createAt, EXCLUDED.cc_createAt);
-    """
-    payload = {"sql": sql}
-    url = f"{CLOUDFLARE_BASE_URL}/query"
-    async with session.post(url, headers=HEADERS, json=payload) as response:
-        response.raise_for_status()
-        print(f"[INFO] Data upserted for {model_url} with {run_count} runs.")
-import asyncio
-
-# Helper: Insert or update model data with retry and exception handling
-async def upsert_model_data(session, model_url, run_count, max_retries=3, retry_delay=5):
-    current_time = datetime.utcnow().isoformat()
-    print('Try to find first index date of', model_url)
-    user_agent = "check huggingface model's user agent"
-    wayback_createAt = None
-    cc_createAt = None    
-
-    try:
-        cdx_api = WaybackMachineCDXServerAPI(model_url, user_agent)
-        oldest = cdx_api.oldest()
-        if oldest.datetime_timestamp:
-            wayback_createAt = oldest.datetime_timestamp.isoformat()
-        print('==WaybackMachineCDXServerAPI=', wayback_createAt)
-    except Exception as e:
-        print('WaybackMachineCDXServerAPI failed:', e)
-
     current_date = datetime.now()
     start_date = current_date - timedelta(days=365)
     start_date = int(start_date.strftime('%Y%m%d'))
-    if ccisopen:
+    for t in ['cc','ia']:
         try:
             cdx = cdx_toolkit.CDXFetcher(source='cc')
             for obj in cdx.iter(model_url, from_ts=start_date, limit=1, cc_sort='ascending'):
-                cc_createAt = obj.get('timestamp')
+                if t=='cc':
+                
+                    cc_createAt = obj.get('timestamp')
+                if t=='ia':
+                    wayback_createAt = obj.get('timestamp')
+                
         except Exception as e:
-            print('CommonCrawl failed:', e)
+            print('t failed:', e)
 
     sql = f"""
-    INSERT INTO huggingface_spaces_data (model_url, run_count, wayback_createAt, cc_createAt, updateAt)
+    INSERT INTO huggingface_spaces_data (model_url, run_count, google_indexAt,wayback_createAt, cc_createAt, updateAt)
     VALUES ('{model_url}', {run_count}, 
+    
+            {f"'{google_indexAt}'" if google_indexAt else 'NULL'}, 
             {f"'{wayback_createAt}'" if wayback_createAt else 'NULL'}, 
             {f"'{cc_createAt}'" if cc_createAt else 'NULL'}, 
             '{current_time}')
     ON CONFLICT (model_url) DO UPDATE
     SET run_count = {run_count}, 
         updateAt = '{current_time}',
+        google_indexAt = COALESCE(huggingface_spaces_data.google_indexAt, EXCLUDED.google_indexAt),
         wayback_createAt = COALESCE(huggingface_spaces_data.wayback_createAt, EXCLUDED.wayback_createAt),
         cc_createAt = COALESCE(huggingface_spaces_data.cc_createAt, EXCLUDED.cc_createAt);
     """
@@ -200,14 +153,14 @@ async def upsert_model_data(session, model_url, run_count, max_retries=3, retry_
     print(f"[ERROR] Failed to upsert data for {model_url} after {max_retries} attempts.")
 
 # Process a single model URL
-async def process_model_url(semaphore, session, model_url):
+async def process_model_url(semaphore, session, model_url,gindex=None):
     async with semaphore:
         print(f"[INFO] Processing model: {model_url}")
         run_count = await get_model_runs(session, model_url)
         print(f"[INFO] save statics: {run_count}")
         
         if run_count is not None:
-            await upsert_model_data(session, model_url, run_count)
+            await upsert_model_data(session, model_url, run_count,google_indexAt=gindex)
 
 # Main function
 async def main():
@@ -260,18 +213,21 @@ async def main():
             cleanurls.append(url)
         model_urls=list(set(cleanurls))
         print('cleanurls',len(model_urls))
+        await asyncio.gather(*(process_model_url(semaphore, session, url) for url in model_urls))
         
         d=DomainMonitor()
+        search_model_urls=[]
         results=d.monitor_site(site=baseUrl,time_range='24h')
         if len(results)>1:
             for r in results:
-                model_urls.append(r.get('url'))
-        model_urls=list(set(cleanurls))[:10]
+                search_model_urls.append(r.get('url'))
+        search_model_urls=list(set(search_model_urls))
         print("[INFO] google search check  complete.")
-        
-        await asyncio.gather(*(process_model_url(semaphore, session, url) for url in model_urls))
+        gindex=int(datetime.now().strftime('%Y%m%d'))
 
-        print("[INFO] Sitemap parsing complete.")
+        await asyncio.gather(*(process_model_url(semaphore, session, url,gindex) for url in search_model_urls))
+
+        print("[INFO] url detect complete.")
 
 
 if __name__ == "__main__":
