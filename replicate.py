@@ -1,9 +1,8 @@
 import os
-import requests
-import time
+import aiohttp
+import asyncio
 from bs4 import BeautifulSoup
 from datetime import datetime
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from dotenv import load_dotenv
 import re
 
@@ -23,49 +22,53 @@ HEADERS = {
     "Content-Type": "application/json",
 }
 
+# Semaphore for controlling concurrency
+MAX_CONCURRENT_REQUESTS = 50  # Adjust based on system capabilities
+semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
+
 # Helper: Parse a sitemap and return all <loc> URLs
-def parse_sitemap(url):
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.content, "xml")
-        return [loc.text for loc in soup.find_all("loc")]
-    except requests.RequestException as e:
-        print(f"[ERROR] Failed to fetch sitemap {url}: {e}")
-        return []
-    except Exception as e:
-        print(f"[ERROR] Parsing error: {e}")
-        return []
+async def parse_sitemap(url, session):
+    async with semaphore:
+        try:
+            async with session.get(url) as response:
+                response.raise_for_status()
+                text = await response.text()
+                soup = BeautifulSoup(text, "xml")
+                return [loc.text for loc in soup.find_all("loc")]
+        except aiohttp.ClientError as e:
+            print(f"[ERROR] Failed to fetch sitemap {url}: {e}")
+            return []
 
 # Helper: Fetch model page and extract run count
-def get_model_runs(url):
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.text, "html.parser")
-        run_span = soup.find("ul", class_="mt-3 flex gap-4 items-center flex-wrap")
-        if run_span:
-            t = run_span.get_text(strip=True).lower()
-            t = t.replace('public', '').replace('\n', '').strip()
-            t=t.split('runs')[0].strip()
-            if 'k' in t:
-                t = int(float(t.replace('k', '')) * 1000)
-            elif 'm' in t:
-                t = int(float(t.replace('m', '')) * 1000000)
+async def get_model_runs(url, session):
+    async with semaphore:
+        try:
+            async with session.get(url) as response:
+                response.raise_for_status()
+                text = await response.text()
+                soup = BeautifulSoup(text, "html.parser")
+                run_span = soup.find("ul", class_="mt-3 flex gap-4 items-center flex-wrap")
+                if run_span:
+                    t = run_span.get_text(strip=True).lower()
+                    t = t.replace('public', '').replace('\n', '').strip()
+                    t = t.split('runs')[0].strip()
+                    if 'k' in t:
+                        t = int(float(t.replace('k', '')) * 1000)
+                    elif 'm' in t:
+                        t = int(float(t.replace('m', '')) * 1000000)
 
-            t=re.search(r'\d+', str(t)).group(0)
-            
-            t = int(t)
-            return t
-        else:
-            print(f"[WARNING] No run count found on page: {url}")
+                    t = re.search(r'\d+', str(t)).group(0)
+                    t = int(t)
+                    return t
+                else:
+                    print(f"[WARNING] No run count found on page: {url}")
+                    return None
+        except aiohttp.ClientError as e:
+            print(f"[ERROR] Failed to fetch model page {url}: {e}")
             return None
-    except Exception as e:
-        print(f"[ERROR] Failed to fetch model page {url}: {e}")
-        return None
 
 # Helper: Create table in the database
-def create_table_if_not_exists():
+async def create_table_if_not_exists(session):
     create_table_sql = """
     CREATE TABLE IF NOT EXISTS replicate_model_data (
         id SERIAL PRIMARY KEY,
@@ -78,14 +81,14 @@ def create_table_if_not_exists():
     payload = {"sql": create_table_sql}
     url = f"{CLOUDFLARE_BASE_URL}/query"
     try:
-        response = requests.post(url, headers=HEADERS, json=payload)
-        response.raise_for_status()
-        print("[INFO] Table replicate_model_data checked/created successfully.")
-    except requests.RequestException as e:
+        async with session.post(url, headers=HEADERS, json=payload) as response:
+            response.raise_for_status()
+            print("[INFO] Table replicate_model_data checked/created successfully.")
+    except aiohttp.ClientError as e:
         print(f"[ERROR] Failed to create table: {e}")
 
 # Helper: Insert or update model data
-def upsert_model_data(model_url, run_count):
+async def upsert_model_data(model_url, run_count, session):
     current_time = datetime.utcnow().isoformat()
     sql = f"""
     INSERT INTO replicate_model_data (model_url, run_count, createAt, updateAt)
@@ -98,47 +101,45 @@ def upsert_model_data(model_url, run_count):
     payload = {"sql": sql}
     url = f"{CLOUDFLARE_BASE_URL}/query"
     try:
-        response = requests.post(url, headers=HEADERS, json=payload)
-        response.raise_for_status()
-        print(f"[INFO] Data upserted for {model_url} with {run_count} runs.")
-    except requests.RequestException as e:
+        async with session.post(url, headers=HEADERS, json=payload) as response:
+            response.raise_for_status()
+            print(f"[INFO] Data upserted for {model_url} with {run_count} runs.")
+    except aiohttp.ClientError as e:
         print(f"[ERROR] Failed to upsert data for {model_url}: {e}")
 
 # Main workflow
-def process_model_url(model_url):
+async def process_model_url(model_url, session):
     print(f"[INFO] Processing model: {model_url}")
-    run_count = get_model_runs(model_url)
+    run_count = await get_model_runs(model_url, session)
     if run_count is not None:
-        upsert_model_data(model_url, run_count)
+        await upsert_model_data(model_url, run_count, session)
 
-def main():
+async def main():
     print("[INFO] Starting sitemap parsing...")
-    create_table_if_not_exists()
+    async with aiohttp.ClientSession() as session:
+        await create_table_if_not_exists(session)
 
-    # Parse the root sitemap
-    subsitemaps = parse_sitemap(ROOT_SITEMAP_URL)
-    if not subsitemaps:
-        print("[ERROR] No subsitemaps found.")
-        return
+        # Parse the root sitemap
+        subsitemaps = await parse_sitemap(ROOT_SITEMAP_URL, session)
+        if not subsitemaps:
+            print("[ERROR] No subsitemaps found.")
+            return
 
-    for subsitemap_url in subsitemaps:
-        if subsitemap_url != 'https://replicate.com/sitemap-models.xml':
-            print(f"[INFO] Skipping unsupported sitemap: {subsitemap_url}")
-            continue
+        tasks = []
+        for subsitemap_url in subsitemaps:
+            if subsitemap_url != 'https://replicate.com/sitemap-models.xml':
+                print(f"[INFO] Skipping unsupported sitemap: {subsitemap_url}")
+                continue
 
-        print(f"[INFO] Parsing subsitemap: {subsitemap_url}")
-        model_urls = parse_sitemap(subsitemap_url)
+            print(f"[INFO] Parsing subsitemap: {subsitemap_url}")
+            model_urls = await parse_sitemap(subsitemap_url, session)
 
-        with ThreadPoolExecutor(max_workers=20) as executor:  # Adjust workers as needed
-            futures = [executor.submit(process_model_url, model_url) for model_url in model_urls]
-            for future in as_completed(futures):
-                try:
-                    future.result()
-                except Exception as e:
-                    print(f"[ERROR] Exception during processing: {e}")
+            for model_url in model_urls:
+                tasks.append(process_model_url(model_url, session))
 
+        await asyncio.gather(*tasks)
     print("[INFO] Sitemap parsing complete.")
 
 # Run the script
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
