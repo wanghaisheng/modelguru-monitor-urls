@@ -24,7 +24,7 @@ def collect_data_wayback(website_url,
     and waiting for a few seconds between each API call.
     Params:
         website_url (str): the url domain. All urls matching that domain will be searched on the Wayback machine.
-        output_dir (str): the path to the file were the retrieved urls are stored.
+        output_dir (str): the path to the file where the retrieved urls are stored.
         start_date (int): results archived from that date will be returned. Format : YYYYMMDD
         end_date (int): results archived up to that date will be returned. Format : YYYYMMDD
         resume_key (str): if not all urls have been returned in the previous iteration, the resume key allows to start from the last url retrieved.
@@ -49,10 +49,17 @@ def collect_data_wayback(website_url,
     if resume_key:
         url += '&resumeKey=' + resume_key
     
+    previous_resume_key = ''
     its = max_count // chunk_size
     for _ in tqdm(range(its)):
+        if resume_key == previous_resume_key:
+            print("No new data, breaking the loop.")
+            break
+        previous_resume_key = resume_key
+        
         for attempt in range(retries):
             try:
+                print(f"Attempt {attempt+1}/{retries}: Fetching {url}")
                 result = rq.get(url)
                 result.raise_for_status()
                 parse_url = result.json()
@@ -70,11 +77,11 @@ def collect_data_wayback(website_url,
                 time.sleep(sleep)
                 break
             except (rq.RequestException, ValueError) as e:
+                print(f"Error on attempt {attempt+1}: {e}")
                 if attempt < retries - 1:
                     time.sleep(2 ** attempt)
-                    continue
                 else:
-                    print(f"Failed to fetch data after {retries} attempts. Error: {e}")
+                    print(f"Failed after {retries} attempts.")
                     return url_list
 
     print('urls count', len(url_list))
@@ -93,9 +100,9 @@ if __name__ == '__main__':
                         help='End date for the collection of URLs.')
     parser.add_argument('--max_count', type=int, default=20000,
                         help='Maximum number of URLs to collect.')
-    parser.add_argument('--chunk_size', type=int, default=4000,
+    parser.add_argument('--chunk_size', type=int, default=1000,
                         help='Size of each chunk to query the Wayback Machine API.')
-    parser.add_argument('--sleep', type=int, default=5,
+    parser.add_argument('--sleep', type=int, default=10,
                         help='Waiting time between two calls of the Wayback machine API.')
 
     args = parser.parse_args()
