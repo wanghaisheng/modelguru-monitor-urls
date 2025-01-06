@@ -81,13 +81,14 @@ async def create_table_if_not_exists(session):
 # Helper: Insert or update model data
 async def upsert_model_data(session, model_url, run_count):
     current_time = datetime.utcnow().isoformat()
+    print('try to find first index date of ',url)
     user_agent = "check huggignface model's user agent"
     createAt=current_time
     cdx_api = WaybackMachineCDXServerAPI(model_url, user_agent)
     oldest = cdx_api.oldest()
     if oldest.datetime_timestamp:
         createAt =oldest.datetime_timestamp.isoformat()
-        
+    print('===',createAt)
     
 
     
