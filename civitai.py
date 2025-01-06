@@ -54,8 +54,8 @@ async def get_model_runs(url, session):
                 
                 if run_spans and len(run_spans) > 2:
                     td = run_spans[1]
-                    spans=soup.find_all("span",class_="mantine-h9iq4m mantine-Badge-inner")
-                    for div in spans:
+                    spans=td.find_all("span",class_="mantine-h9iq4m mantine-Badge-inner")
+                    for run_span in spans:
                         
                         t = run_span.get_text(strip=True).lower()
                         print('stats', t)
