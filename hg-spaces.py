@@ -199,7 +199,7 @@ async def main():
         
         baseUrl='https://huggingface.co/spaces/'
         if len(model_urls)<1:
-            retrun 
+            return 
         cleanurls=[]
         print('start clean url')
         for url in model_urls:
