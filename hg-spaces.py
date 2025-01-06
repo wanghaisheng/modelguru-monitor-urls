@@ -81,7 +81,7 @@ async def create_table_if_not_exists(session):
         print("[INFO] Table huggingface_spaces_data checked/created successfully.")
 
 # Helper: Insert or update model data
-async def upsert_model_data(session, model_url, run_count):
+async def upsert_model_dataold(session, model_url, run_count):
     current_time = datetime.utcnow().isoformat()
     print('try to find first index date of ',model_url)
     user_agent = "check huggignface model's user agent"
@@ -114,6 +114,47 @@ async def upsert_model_data(session, model_url, run_count):
     SET run_count = {run_count}, 
         updateAt = '{current_time}',
         createAt = huggingface_spaces_data.createAt;
+    """
+    payload = {"sql": sql}
+    url = f"{CLOUDFLARE_BASE_URL}/query"
+    async with session.post(url, headers=HEADERS, json=payload) as response:
+        response.raise_for_status()
+        print(f"[INFO] Data upserted for {model_url} with {run_count} runs.")
+async def upsert_model_data(session, model_url, run_count):
+    current_time = datetime.utcnow().isoformat()
+    print('try to find first index date of ', model_url)
+    user_agent = "check huggingface model's user agent"
+    wayback_createAt = None
+    cc_createAt = None    
+
+    try:
+        cdx_api = WaybackMachineCDXServerAPI(model_url, user_agent)
+        oldest = cdx_api.oldest()
+        if oldest.datetime_timestamp:
+            wayback_createAt = oldest.datetime_timestamp.isoformat()
+        print('==WaybackMachineCDXServerAPI=', wayback_createAt)
+    except Exception as e:
+        print('WaybackMachineCDXServerAPI failed:', e)
+
+    # Common Crawl fetching logic (commented out in your example)
+    # try:
+    #     cdx = cdx_toolkit.CDXFetcher(source='cc')
+    #     for obj in cdx.iter(model_url, limit=1, cc_sort='ascending'):
+    #         cc_createAt = obj.timestamp
+    # except Exception as e:
+    #     print('commoncrawl failed:', e)
+
+    sql = f"""
+    INSERT INTO huggingface_spaces_data (model_url, run_count, wayback_createAt, cc_createAt, updateAt)
+    VALUES ('{model_url}', {run_count}, 
+            {f"'{wayback_createAt}'" if wayback_createAt else 'NULL'}, 
+            {f"'{cc_createAt}'" if cc_createAt else 'NULL'}, 
+            '{current_time}')
+    ON CONFLICT (model_url) DO UPDATE
+    SET run_count = {run_count}, 
+        updateAt = '{current_time}',
+        wayback_createAt = COALESCE(huggingface_spaces_data.wayback_createAt, EXCLUDED.wayback_createAt),
+        cc_createAt = COALESCE(huggingface_spaces_data.cc_createAt, EXCLUDED.cc_createAt);
     """
     payload = {"sql": sql}
     url = f"{CLOUDFLARE_BASE_URL}/query"
