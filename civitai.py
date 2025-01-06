@@ -41,6 +41,8 @@ async def parse_sitemap(url, session):
 
 # Helper: Fetch model page and extract run count
 async def get_model_runs(url, session):
+    stats=[]
+    
     async with semaphore:
         try:
             async with session.get(url) as response:
@@ -48,24 +50,30 @@ async def get_model_runs(url, session):
                 text = await response.text()
                 soup = BeautifulSoup(text, "html.parser")
                 run_spans = soup.find_all("tr", class_="mantine-1avyp1d")
+
+                
                 if run_spans and len(run_spans) > 2:
-                    run_span = run_spans[1]
-                    t = run_span.get_text(strip=True).lower()
-                    print('stats', t)
-                    if 'k' in t:
-                        t = int(float(t.replace('k', '')) * 1000)
-                    elif 'm' in t:
-                        t = int(float(t.replace('m', '')) * 1000000)
-                    if ',' in t:
-                        t = t.replace(',', '')
-                    t = int(t)
-                    return t
+                    td = run_spans[1]
+                    spans=soup.find_all("span",class_="mantine-h9iq4m mantine-Badge-inner")
+                    for div in spans:
+                        
+                        t = run_span.get_text(strip=True).lower()
+                        print('stats', t)
+                        if 'k' in t:
+                            t = int(float(t.replace('k', '')) * 1000)
+                        elif 'm' in t:
+                            t = int(float(t.replace('m', '')) * 1000000)
+                        if ',' in t:
+                            t = t.replace(',', '')
+                        t = int(t)
+                        stats.append(t)
+                    return stats
                 else:
                     print(f"[WARNING] No run count found on page: {url}")
-                    return None
+                    return stats
         except aiohttp.ClientError as e:
             print(f"[ERROR] Failed to fetch model page {url}: {e}")
-            return None
+            return stats
 
 # Helper: Create table in the database
 async def create_table_if_not_exists(session):
@@ -73,6 +81,7 @@ async def create_table_if_not_exists(session):
     CREATE TABLE IF NOT EXISTS civitai_model_data (
         id SERIAL PRIMARY KEY,
         model_url TEXT UNIQUE,
+        download_count INTEGER,
         run_count INTEGER,
         type TEXT,
         createAt TEXT,
@@ -89,11 +98,13 @@ async def create_table_if_not_exists(session):
         print(f"[ERROR] Failed to create table: {e}")
 
 # Helper: Insert or update model data
-async def upsert_model_data(model_url, run_count, type, session):
+async def upsert_model_data(model_url, stats, type, session):
     current_time = datetime.utcnow().isoformat()
+    download_count=stats[0]
+    run_count=stats[1]
     sql = f"""
-    INSERT INTO civitai_model_data (model_url, run_count, type, createAt, updateAt)
-    VALUES ('{model_url}', {run_count}, '{type}', '{current_time}', '{current_time}')
+    INSERT INTO civitai_model_data (model_url, download_count,run_count, type, createAt, updateAt)
+    VALUES ('{model_url}',{download_count}, {run_count}, '{type}', '{current_time}', '{current_time}')
     ON CONFLICT (model_url) DO UPDATE
     SET run_count = {run_count}, 
         updateAt = '{current_time}',
@@ -111,9 +122,9 @@ async def upsert_model_data(model_url, run_count, type, session):
 # Main workflow
 async def process_model_url(model_url, type, session):
     print(f"[INFO] Processing model: {model_url}")
-    run_count = await get_model_runs(model_url, session)
-    if run_count is not None:
-        await upsert_model_data(model_url, run_count, type, session)
+    stats = await get_model_runs(model_url, session)
+    if stats is not None and len(stats)==2:
+        await upsert_model_data(model_url, stats, type, session)
 
 async def main():
     print("[INFO] Starting sitemap parsing...")
