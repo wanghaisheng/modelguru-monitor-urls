@@ -27,7 +27,7 @@ HEADERS = {
 ccisopen=False
 
 # Concurrency limit
-SEM_LIMIT = 50
+SEM_LIMIT = 20
 
 # Helper: Parse a sitemap and return all <loc> URLs
 async def parse_sitemap(session, url):
