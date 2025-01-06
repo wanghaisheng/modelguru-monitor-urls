@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import re
 import aiohttp
 from collect_data_wayback import collect_data_wayback
+from waybackpy import WaybackMachineCDXServerAPI
 
 # Load environment variables
 load_dotenv()
@@ -80,9 +81,19 @@ async def create_table_if_not_exists(session):
 # Helper: Insert or update model data
 async def upsert_model_data(session, model_url, run_count):
     current_time = datetime.utcnow().isoformat()
+    user_agent = "check huggignface model's user agent"
+    createAt=current_time
+    cdx_api = WaybackMachineCDXServerAPI(model_url, user_agent)
+    oldest = cdx_api.oldest()
+    if oldest.datetime_timestamp:
+        createAt =oldest.datetime_timestamp.isoformat()
+        
+    
+
+    
     sql = f"""
     INSERT INTO huggingface_spaces_data (model_url, run_count, createAt, updateAt)
-    VALUES ('{model_url}', {run_count}, '{current_time}', '{current_time}')
+    VALUES ('{model_url}', {run_count}, '{createAt}', '{current_time}')
     ON CONFLICT (model_url) DO UPDATE
     SET run_count = {run_count}, 
         updateAt = '{current_time}',
