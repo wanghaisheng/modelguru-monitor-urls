@@ -40,6 +40,12 @@ async def parse_sitemap(session, url):
 # Helper: Fetch model page and extract run count
 async def get_model_runs(session, url):
     try:
+        # https://huggingface.co/spaces/AP123/IllusionDiffusion/discussions/94
+        baseUrl='https://huggingface.co/spaces/'
+        modelname=url.replace(baseUrl,'').split('/')
+        if len(modelname)<2:
+            continue
+        url=baseUrl+modelname[0]+'/'+modelname[1]
         async with session.get(url) as response:
             response.raise_for_status()
             soup = BeautifulSoup(await response.text(), "html.parser")
