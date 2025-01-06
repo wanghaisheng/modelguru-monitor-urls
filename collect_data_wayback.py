@@ -60,7 +60,7 @@ def collect_data_wayback(website_url,
         for attempt in range(retries):
             try:
                 print(f"Attempt {attempt+1}/{retries}: Fetching {url}")
-                result = rq.get(url)
+                result = rq.get(url,timeout=300)
                 result.raise_for_status()
                 parse_url = result.json()
                 
