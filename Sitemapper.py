@@ -67,10 +67,10 @@ class Sitemapper:
 
         return good_links
 
-(*     async def find_model_urls(self, start_url, keyword="model", block_extensions=['.pdf'], max_urls=100): *)
-(*         crawled_urls = await self.main(start_url, block_extensions, max_urls) *)
-(*         model_urls = [url for url in crawled_urls if keyword in url.lower()] *)
-(*         return model_urls *)
+     async def find_model_urls(self, start_url, keyword="model", block_extensions=['.pdf'], max_urls=100): 
+         crawled_urls = await self.main(start_url, block_extensions, max_urls) 
+         model_urls = [url for url in crawled_urls if keyword in url.lower()] 
+         return model_urls 
 
 # Example usage:
 # asyncio.run(sitemapper.find_model_urls("https://example.com", keyword="model"))
