@@ -56,16 +56,12 @@ def collect_data_wayback(website_url,
         ## Extracts timestamp and original columns from urls and compiles a url list.
         for i in range(1,len(parse_url)-2):
             orig_url = parse_url[i][2]
+            if parse_url[i][4]!=200:
+              continue
             print('0000====',orig_url)
-            if len(orig_url.lower().split(website_url)) > 1:
-                article_name = orig_url.lower().split(website_url)[1].split('/')[0].split('?')[0]
-            else:
-                article_name = website_url   
-            if  article_name not in unique_articles_set:
-                tstamp = parse_url[i][1]
-                waylink ='https://web.archive.org/web/' + tstamp+'/'+orig_url.split(website_url)[0] + website_url + article_name
-                url_list.append(waylink)
-                unique_articles_set.add(article_name)
+            if  orig_url not in unique_articles_set:
+                url_list.append(orig_url)
+                unique_articles_set.add(orig_url)
         url =  'http://web.archive.org/cdx/search/cdx?url=' + website_url + '&collapse=digest&showResumeKey=true&resumeKey='+ resume_key +'&matchType=prefix&filter=!statuscode:404&from=%s&to=%s&limit=%s&output=json'%(start_date,end_date,chunk_size)       
         time.sleep(sleep)     
 
@@ -78,7 +74,8 @@ def collect_data_wayback(website_url,
         file.write(resume_key)
     print('Last article : ' + url_list[-1].split('/')[-2] + '/' + url_list[-1].split('/')[-1])
     print('Enter resume key if you want to continue.')
-    return resume_key
+    return url_list
+    # return resume_key
 
 
 
