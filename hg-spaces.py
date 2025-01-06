@@ -10,7 +10,7 @@ import aiohttp
 from collect_data_wayback import collect_data_wayback
 from waybackpy import WaybackMachineCDXServerAPI
 import cdx_toolkit
-from domain-latest-url import DomainMonitor
+from domainLatestUrl import DomainMonitor
 # Load environment variables
 load_dotenv()
 
