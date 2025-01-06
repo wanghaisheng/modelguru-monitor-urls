@@ -24,6 +24,7 @@ HEADERS = {
     "Authorization": f"Bearer {CLOUDFLARE_API_TOKEN}",
     "Content-Type": "application/json",
 }
+ccisopen=False
 
 # Concurrency limit
 SEM_LIMIT = 50
@@ -101,13 +102,14 @@ async def upsert_model_data(session, model_url, run_count):
     current_date = datetime.now()
     start_date = current_date - timedelta(days=365)
     start_date=int(start_date.strftime('%Y%m%d')),
+    if ccisopen:
 
-    try:
-        cdx = cdx_toolkit.CDXFetcher(source='cc')
-        for obj in cdx.iter(model_url,from_ts=start_date, limit=1, cc_sort='ascending'):
-            cc_createAt = obj.get('timestamp')
-    except Exception as e:
-        print('commoncrawl failed:', e)
+        try:
+            cdx = cdx_toolkit.CDXFetcher(source='cc')
+            for obj in cdx.iter(model_url,from_ts=start_date, limit=1, cc_sort='ascending'):
+                cc_createAt = obj.get('timestamp')
+        except Exception as e:
+            print('commoncrawl failed:', e)
 
     sql = f"""
     INSERT INTO huggingface_spaces_data (model_url, run_count, wayback_createAt, cc_createAt, updateAt)
