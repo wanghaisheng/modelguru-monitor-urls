@@ -94,6 +94,99 @@ def collect_data_wayback(website_url,
     print('Collected %s of the initial number of requested urls' % (round(len(url_list) / max_count, 2)))
     return url_list
 
+
+import random
+
+# Load SOCKS5 proxies from a URL (or you can load from a file if you prefer)
+def load_proxies(url):
+    try:
+        response = rq.get(url)
+        response.raise_for_status()
+        return response.text.splitlines()
+    except rq.RequestException as e:
+        print(f"Error fetching proxy list from {url}: {e}")
+        return []
+
+# Function to select a random proxy
+def get_random_proxy(proxy_list):
+    return random.choice(proxy_list) if proxy_list else None
+
+sys.path.insert(1, os.path.join(sys.path[0], '..'))
+
+def exact_url_timestamp(website_url,
+                         sleep=3,
+                         retries=5,
+                         proxy_retries=3,  # Added retry limit for proxies
+                         proxies=None):  # Added proxies parameter
+    if 'http://' in website_url:
+        website_url = website_url.replace('http://', '')
+    if 'https://' in website_url:
+        website_url = website_url.replace('https://', '')
+
+
+    unique_articles_set = set()
+    url_list = []
+    url = f'http://web.archive.org/cdx/search/cdx?url=https://www.{website_url}&collapse=urlkey&filter=!statuscode:404&showResumeKey=true&matchType=exact&limit=1&output=json'    
+    max_count=1
+    chunk_size=1
+    its = max_count // chunk_size
+    progress_bar = tqdm(total=its)
+
+    for _ in range(its):
+        for attempt in range(retries):
+            for proxy_attempt in range(proxy_retries):  # Retry with different proxies if request fails
+                try:
+                    # Select a random proxy from the list
+                    proxy = get_random_proxy(proxies)
+                    proxy_dict = None
+                    if proxy:
+                        # Define the proxy for requests
+                        proxy_dict = {'http': f'socks5://{proxy}', 'https': f'socks5://{proxy}'}
+
+                    result = rq.get(url, proxies=proxy_dict)
+                    result.raise_for_status()
+                    parse_url = result.json()
+
+                    if len(parse_url) < 2:
+                        print("No more data to fetch.")
+                        progress_bar.close()
+                        return url_list
+                                        
+                    for i in range(1, len(parse_url) - 1):
+                        if len(parse_url[i]) < 5:
+                            continue
+                        orig_url = parse_url[i][2]
+                        print('======', orig_url)
+                        indexdate = parse_url[i][6]
+                        url_list.append(orig_url)
+                        url_list.append(indexdate)
+                      
+                    break  # Exit proxy retry loop if successful
+                except (rq.RequestException, ValueError) as e:
+                    if proxy_attempt < proxy_retries - 1:
+                        print(f"Proxy failed. Retrying with another proxy. Attempt {proxy_attempt + 1}/{proxy_retries}")
+                        continue  # Try another proxy
+                    else:
+                        print(f"Failed to fetch data after {proxy_retries} proxy attempts. Error: {e}")
+                        progress_bar.close()
+                        return url_list
+            print('current url index date', url_list)
+
+            progress_bar.update(1)
+
+            # Check if the progress is complete
+            if progress_bar.n == its:
+                print("Progress completed. Returning results.")
+                progress_bar.close()
+                return url_list
+
+    progress_bar.close()
+    print('urls count', len(url_list))
+    print('Collected %s of the initial number of requested urls' % (round(len(url_list) / max_count, 2)))
+    return url_list
+
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Download articles and images from the Wayback machine.')
     parser.add_argument('--url_domain', type=str, default='factly.in/', 
