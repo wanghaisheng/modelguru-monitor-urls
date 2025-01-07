@@ -109,6 +109,7 @@ async def get_existing_model_data():
                 return []
 
             response_data = await response.json()
+            print('quety===',response_data)
             if not response_data.get('success'):
                 print(f"API Error: {response_data.get('errors')}")
                 return []
