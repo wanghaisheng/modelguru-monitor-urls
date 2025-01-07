@@ -93,27 +93,40 @@ async def create_table_if_not_exists(session):
             return True  # Assuming table creation was successful
         return False  # Assuming table already existed
 
+import aiohttp
+import json
+import os
 
-async def get_existing_model_urls():
-    try:
-        # Assuming we're querying the actual database table with the relevant columns
-        query = "SELECT * FROM huggingface_spaces_data"
-        
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                f"{CLOUDFLARE_BASE_URL}/query", headers=HEADERS, json={"query": query}
-            ) as response:
-                data = await response.json()
-                print('query existing data',data)
-                if "result" in data:
-                    models = data["result"]['results']
-                    if models:
-                        return models
-                else:
-                    return []
-    except Exception as e:
-        print(f"[ERROR] Error in get_existing_model_urls: {e}")
-        return []
+async def get_existing_model_data():
+    url = f"https://api.cloudflare.com/client/v4/accounts/{os.getenv('ACCOUNT_ID')}/d1/database/{os.getenv('DATABASE_ID')}/query"
+    headers = {
+        'Content-Type': 'application/json',
+        'X-Auth-Email': os.getenv('CLOUDFLARE_EMAIL'),
+        'X-Auth-Key': os.getenv('CLOUDFLARE_API_KEY')
+    }
+    query = {
+        "sql": "SELECT * FROM huggingface_spaces_data;",
+        "params": []
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, headers=headers, json=query) as response:
+            if response.status != 200:
+                print(f"Error: Received HTTP {response.status}")
+                return []
+
+            response_data = await response.json()
+            if not response_data.get('success'):
+                print(f"API Error: {response_data.get('errors')}")
+                return []
+
+            result = response_data.get('result').get('results')
+            if not result:
+                print("No result found.")
+                return []
+
+            # Return all rows of data
+            return result
 
 
 # Helper: Check if there is any data in the table
