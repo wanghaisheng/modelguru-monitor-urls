@@ -248,7 +248,7 @@ async def main():
         if is_populated==False:
             print('Using Wayback Machine as initial')
             current_date = datetime.now()
-            start_date = current_date - timedelta(days=365)
+            start_date = current_date - timedelta(days=730)
             file_path = 'hg.txt'
             items=exact_url_timestamp(
                 baseUrl,
