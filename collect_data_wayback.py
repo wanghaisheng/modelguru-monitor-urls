@@ -98,7 +98,7 @@ def collect_data_wayback(website_url,
 import random
 
 # Load SOCKS5 proxies from a URL (or you can load from a file if you prefer)
-def load_proxies(url):
+def load_proxies(url=None):
     if url is None:
       url='https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/socks5.txt'
       # https://github.com/proxifly/free-proxy-list/blob/main/proxies/all/data.txt
