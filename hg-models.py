@@ -283,10 +283,13 @@ async def main():
             uniqueurls=[]
             for item in items:
                 url=item.get('url')
+                url=url.replace('https:')
                 wayback_createAt=item.get('timestamp')
                 print('--',url)
                 if '?' in url:
                     url=url.split('?')[0]
+                baseUrl='https://huggingface.co/'
+                    
                 modelname=url.replace(baseUrl,'').split('/')
                 if len(modelname)<2:
                     print('invalid url',url)
