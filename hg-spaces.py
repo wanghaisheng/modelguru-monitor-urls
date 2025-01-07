@@ -88,7 +88,30 @@ async def create_table_if_not_exists(session):
             print("[INFO] Table huggingface_spaces_data checked/created successfully.")
             return True  # Assuming table creation was successful
         return False  # Assuming table already existed
+
+
+async def get_existing_model_urls():
+    try:
+        # Assuming we're querying the actual database table with the relevant columns
+        query = "SELECT * FROM huggingface_spaces_data"
         
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                f"{DATABASE_URL}/query", headers=HEADERS, json={"query": query}
+            ) as response:
+                data = await response.json()
+
+                if "result" in data:
+                    models = data["result"]
+                    if models:
+                        return models
+                else:
+                    return []
+    except Exception as e:
+        print(f"[ERROR] Error in get_existing_model_urls: {e}")
+        return []
+
+
 # Helper: Check if there is any data in the table
 async def is_table_populated(session):
     check_data_sql = "SELECT COUNT(*) AS count FROM huggingface_spaces_data;"
@@ -218,7 +241,7 @@ async def main():
         await create_table_if_not_exists(session)
         is_populated = await is_table_populated(session)
         
-        if is_populated:
+        if is_populated==False:
             print('Using Wayback Machine as initial')
             current_date = datetime.now()
             start_date = current_date - timedelta(days=365)
@@ -266,29 +289,45 @@ async def main():
 
             print('cleanitems',len(cleanitems))
             await asyncio.gather(*(process_model_url(semaphore, session, item) for item in cleanitems))
+        existing_models=get_existing_model_urls()
+        modelurls=[  item.get('model_url')   for item in existing_models]            
         if supportsitemap:
             url_domain = 'https://huggingface.co'
             ROOT_SITEMAP_URL = f"{url_domain}/sitemap.xml"
-            model_urls=[]
-            model_urls = await parse_sitemap(session, ROOT_SITEMAP_URL)
+            new_models = await parse_sitemap(session, ROOT_SITEMAP_URL)
             print("[INFO] Sitemap parsing complete.")
-            model_urls = list(set(model_urls))
+            # model_urls = list(set(model_urls))
+            
         if supportgooglesearch:
             d=DomainMonitor()
             search_model_urls=[]
             results=d.monitor_site(site=baseUrl,time_range='24h')
             print('==',results)
             print("[INFO] google search check  complete.")
-            
+            new_models={}
             if results and len(results)>1:
                 gindex=int(datetime.now().strftime('%Y%m%d'))
                 items=[]
                 for i in results:
                     item={}
-                    item['model_url']=i.get('url')
+                    url=i.get('url')
+                    if '?' in url:
+                        url=url.split('?')[0]
+                    modelname=url.replace(baseUrl,'').split('/')
+                    if len(modelname)<2:
+                        continue
+                    url=baseUrl+modelname[0]+'/'+modelname[1]
+                    if url in modelurls:
+                        continue
+                    item['model_url']=url
+
                     item['google_indexAt']=gindex
                     items.append(item)
-                await asyncio.gather(*(process_model_url(semaphore, session, item) for item in items))
+                    new_models[url] = item
+                cleanitems = list(unique_items.values())
+            all_model_items = list(set(existing_models + new_models))
+
+            await asyncio.gather(*(process_model_url(semaphore, session, item) for item in all_model_items))
 
         print("[INFO] url detect complete.")
 
