@@ -103,7 +103,7 @@ async def get_existing_model_data():
     url = f"{CLOUDFLARE_BASE_URL}/query"
 
     async with aiohttp.ClientSession() as session:
-        async with session.post(url, headers=headers, json=payload) as response:
+        async with session.post(url, headers=HEADERS, json=payload) as response:
             if response.status != 200:
                 print(f"Error: Received HTTP {response.status}")
                 return []
