@@ -277,19 +277,18 @@ async def main():
             d=DomainMonitor()
             search_model_urls=[]
             results=d.monitor_site(site=baseUrl,time_range='24h')
-            if len(results)>1:
-                for r in results:
-                    search_model_urls.append(r.get('url'))
-            search_model_urls=list(set(search_model_urls))
+            print('==',results)
             print("[INFO] google search check  complete.")
-            gindex=int(datetime.now().strftime('%Y%m%d'))
-            items=[]
-            for i in search_model_urls:
-                item={}
-                item['model_url']=url
-                item['google_indexAt']=gindex
-                items.append(item)
-            await asyncio.gather(*(process_model_url(semaphore, session, item) for item in items))
+            
+            if results and len(results)>1:
+                gindex=int(datetime.now().strftime('%Y%m%d'))
+                items=[]
+                for url in results:
+                    item={}
+                    item['model_url']=url
+                    item['google_indexAt']=gindex
+                    items.append(item)
+                await asyncio.gather(*(process_model_url(semaphore, session, item) for item in items))
 
         print("[INFO] url detect complete.")
 
