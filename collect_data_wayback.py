@@ -118,6 +118,9 @@ sys.path.insert(1, os.path.join(sys.path[0], '..'))
 def exact_url_timestamp(website_url,
                          sleep=3,
                          retries=5,
+                         max_count=1000,
+                         chunk_size=100,
+                        
                          proxy_retries=3,  # Added retry limit for proxies
                          proxies=None):  # Added proxies parameter
     if 'http://' in website_url:
@@ -129,8 +132,8 @@ def exact_url_timestamp(website_url,
     unique_articles_set = set()
     items = []
     url = f'http://web.archive.org/cdx/search/cdx?url=https://www.{website_url}&collapse=urlkey&filter=!statuscode:404&showResumeKey=true&matchType=exact&limit=1&output=json'    
-    max_count=1
-    chunk_size=1
+    # max_count=1
+    # chunk_size=1
     its = max_count // chunk_size
     progress_bar = tqdm(total=its)
 
