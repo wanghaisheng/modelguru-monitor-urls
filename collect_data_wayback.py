@@ -153,7 +153,9 @@ def exact_url_timestamp(website_url,
                     else:
                         proxy_dict = {'http': f'{proxy}', 'https': f'{proxy}'}
                       
-                    result = rq.get(url, proxies=proxy_dict)
+                    result = rq.get(url
+                                    # , proxies=proxy_dict
+                                   )
                     result.raise_for_status()
                     parse_url = result.json()
 
