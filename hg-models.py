@@ -283,7 +283,7 @@ async def main():
             uniqueurls=[]
             for item in items[:50]:
                 url=item.get('url')
-                if '/models/' in url ==False:
+                if '.co/models/' not in url:
                     continue
                 wayback_createAt=item.get('timestamp')
                 print('--',url)
