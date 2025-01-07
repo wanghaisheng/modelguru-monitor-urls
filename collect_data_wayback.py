@@ -166,7 +166,6 @@ def exact_url_timestamp(website_url,
                                    )
                     result.raise_for_status()
                     parse_url = result.json()
-                    print('---',url,parse_url)
 
                     if len(parse_url) < 2:
                         print("No more data to fetch.")
@@ -179,7 +178,10 @@ def exact_url_timestamp(website_url,
                         orig_url = parse_url[i][2]
                         indexdate = parse_url[i][1]
                         item={}
+                      
                         orig_url=orig_url.replace('http://','https://')
+                        print('---',orig_url)
+                      
                         item['url']=orig_url
                         item['timestamp']=indexdate
                         items.append(item)
