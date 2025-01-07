@@ -179,6 +179,7 @@ def exact_url_timestamp(website_url,
                         orig_url = parse_url[i][2]
                         indexdate = parse_url[i][1]
                         item={}
+                        orig_url=orig_url.replace('http://','https://')
                         item['url']=orig_url
                         item['timestamp']=indexdate
                         items.append(item)
