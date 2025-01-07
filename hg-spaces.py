@@ -98,19 +98,12 @@ import json
 import os
 
 async def get_existing_model_data():
-    url = f"https://api.cloudflare.com/client/v4/accounts/{os.getenv('ACCOUNT_ID')}/d1/database/{os.getenv('DATABASE_ID')}/query"
-    headers = {
-        'Content-Type': 'application/json',
-        'X-Auth-Email': os.getenv('CLOUDFLARE_EMAIL'),
-        'X-Auth-Key': os.getenv('CLOUDFLARE_API_KEY')
-    }
-    query = {
-        "sql": "SELECT * FROM huggingface_spaces_data;",
-        "params": []
-    }
+    payload = {
+        "sql": "SELECT * FROM huggingface_spaces_data;"    }
+    url = f"{CLOUDFLARE_BASE_URL}/query"
 
     async with aiohttp.ClientSession() as session:
-        async with session.post(url, headers=headers, json=query) as response:
+        async with session.post(url, headers=headers, json=payload) as response:
             if response.status != 200:
                 print(f"Error: Received HTTP {response.status}")
                 return []
