@@ -89,6 +89,26 @@ async def create_table_if_not_exists(session):
             return True  # Assuming table creation was successful
         return False  # Assuming table already existed
         
+# Helper: Check if there is any data in the table
+async def is_table_populated(session):
+    check_data_sql = "SELECT COUNT(*) AS count FROM huggingface_spaces_data;"
+    payload = {"sql": check_data_sql}
+    url = f"{CLOUDFLARE_BASE_URL}/query"
+
+    try:
+        async with session.post(url, headers=HEADERS, json=payload) as response:
+            response.raise_for_status()
+            result = await response.json()
+            if result.get("success"):
+                count = result.get("result")[0].get("count")
+                return count > 0
+            return False
+    except aiohttp.ClientError as e:
+        print(f"[ERROR] Failed to check table data: {e}")
+        return False
+    except Exception as e:
+        print(f"[ERROR] Unexpected error while checking table data: {e}")
+        return False
 
 
 # Helper: Insert or update model data with retry and exception handling
@@ -195,9 +215,11 @@ async def main():
     
     async with aiohttp.ClientSession(timeout=timeout) as session:
         print("[INFO] Starting sitemap parsing...")
-        tablenewcreate=await create_table_if_not_exists(session)
-        if tablenewcreate:
-            print('Using Wayback Machine as fallback')
+        await create_table_if_not_exists(session)
+        is_populated = await is_table_populated(session)
+        
+        if is_populated:
+            print('Using Wayback Machine as initial')
             current_date = datetime.now()
             start_date = current_date - timedelta(days=365)
             file_path = 'hg.txt'
