@@ -306,6 +306,9 @@ async def main():
             print('cleanitems',len(cleanitems))
             await asyncio.gather(*(process_model_url(semaphore, session, item) for item in cleanitems))
         modelurls=[]
+        existing_models=await get_existing_model_urls()
+        print('existing models count',len(existing_models))
+        
         if existing_models!=[]:
             modelurls=[  item.get('model_url')   for item in existing_models]            
         if supportsitemap:
@@ -343,8 +346,6 @@ async def main():
                     new_models[url] = item
                 cleanitems = list(new_models.values())
             print('clean google search url item',cleanitems)
-            existing_models=await get_existing_model_urls()
-            print('existing models count',len(existing_models))
             all_model_items=[]
             
             if cleanitems !=[] and existing_models!=[]:
