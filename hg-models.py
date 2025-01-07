@@ -281,7 +281,7 @@ async def main():
             cleanitems=[]
             print('start clean urls',)
             uniqueurls=[]
-            for item in items:
+            for item in items[:50]:
                 url=item.get('url')
                 wayback_createAt=item.get('timestamp')
                 print('--',url)
