@@ -285,7 +285,7 @@ async def main():
 
                 url=baseUrl+modelname[0]+'/'+modelname[1]
                 if url in unique_items:
-                    print('model url added before')
+                    print('model url added before',url)
                 
                     existing_item = unique_items[url]
                     
@@ -295,7 +295,7 @@ async def main():
                         print('new model url date is older',wayback_createAt)
 
                 else:
-                    print('add new model url ')
+                    print('add new model url ',url)
                     
                     item['model_url'] = url
                     item['wayback_createAt'] = wayback_createAt
