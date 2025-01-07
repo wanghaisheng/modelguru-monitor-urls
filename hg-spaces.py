@@ -189,6 +189,8 @@ async def process_model_url(semaphore, session, item):
 async def main():
     semaphore = asyncio.Semaphore(SEM_LIMIT)
     timeout = ClientTimeout(total=60)
+    supportsitemap=False
+    supportgooglesearch=True
     async with aiohttp.ClientSession(timeout=timeout) as session:
         print("[INFO] Starting sitemap parsing...")
         tablenewcreate=await create_table_if_not_exists(session)
@@ -241,14 +243,14 @@ async def main():
 
             print('cleanitems',len(cleanitems))
             await asyncio.gather(*(process_model_url(semaphore, session, item) for item in cleanitems))
-        else:
+        if supportsitemap:
             url_domain = 'https://huggingface.co'
             ROOT_SITEMAP_URL = f"{url_domain}/sitemap.xml"
             model_urls=[]
             model_urls = await parse_sitemap(session, ROOT_SITEMAP_URL)
             print("[INFO] Sitemap parsing complete.")
             model_urls = list(set(model_urls))
-       
+        if supportgooglesearch:
             d=DomainMonitor()
             search_model_urls=[]
             results=d.monitor_site(site=baseUrl,time_range='24h')
