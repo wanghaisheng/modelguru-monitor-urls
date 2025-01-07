@@ -127,7 +127,7 @@ def exact_url_timestamp(website_url,
 
 
     unique_articles_set = set()
-    url_list = []
+    items = []
     url = f'http://web.archive.org/cdx/search/cdx?url=https://www.{website_url}&collapse=urlkey&filter=!statuscode:404&showResumeKey=true&matchType=exact&limit=1&output=json'    
     max_count=1
     chunk_size=1
@@ -159,9 +159,12 @@ def exact_url_timestamp(website_url,
                             continue
                         orig_url = parse_url[i][2]
                         indexdate = parse_url[i][1]
-                        # url_list.append(orig_url)
-                        url_list.append(indexdate)
-                        print('======', url_list)
+                        item={}
+                        item['url']=orig_url
+                        item['timestamp']=indexdate
+                        items.append(item)
+
+                      print('======', items)
                       
                     break  # Exit proxy retry loop if successful
                 except (rq.RequestException, ValueError) as e:
@@ -171,8 +174,8 @@ def exact_url_timestamp(website_url,
                     else:
                         print(f"Failed to fetch data after {proxy_retries} proxy attempts. Error: {e}")
                         progress_bar.close()
-                        return url_list
-            print('current url index date', url_list)
+                        return items
+            print('current url index date', items)
 
             progress_bar.update(1)
 
@@ -180,12 +183,12 @@ def exact_url_timestamp(website_url,
             if progress_bar.n == its:
                 print("Progress completed. Returning results.")
                 progress_bar.close()
-                return url_list
+                return items
 
     progress_bar.close()
-    print('urls count', len(url_list))
-    print('Collected %s of the initial number of requested urls' % (round(len(url_list) / max_count, 2)))
-    return url_list
+    print('urls count', len(items))
+    print('Collected %s of the initial number of requested urls' % (round(len(items) / max_count, 2)))
+    return items
 
 
 
