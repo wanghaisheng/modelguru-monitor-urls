@@ -356,6 +356,7 @@ async def main():
             all_model_items=[]
             
             if cleanitems !=[] and existing_models!=[]:
+                print('before combine',type(existing_models),type(cleanitems))
                 all_model_items = list(set(existing_models + cleanitems))
 
             await asyncio.gather(*(process_model_url(semaphore, session, item) for item in all_model_items))
