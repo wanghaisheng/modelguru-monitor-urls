@@ -306,6 +306,7 @@ async def main():
             print('cleanitems',len(cleanitems))
             await asyncio.gather(*(process_model_url(semaphore, session, item) for item in cleanitems))
         existing_models=await get_existing_model_urls()
+        print('existing models count',len(existing_models))
         modelurls=[  item.get('model_url')   for item in existing_models]            
         if supportsitemap:
             url_domain = 'https://huggingface.co'
