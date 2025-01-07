@@ -114,7 +114,7 @@ async def get_existing_model_data():
                 print(f"API Error: {response_data.get('errors')}")
                 return []
 
-            result = response_data.get('result')
+            result = response_data.get('result')[0].get('results')
             if not result:
                 print("No result found.")
                 return []
