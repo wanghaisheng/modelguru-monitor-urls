@@ -11,7 +11,7 @@ from collect_data_wayback import collect_data_wayback,exact_url_timestamp
 from waybackpy import WaybackMachineCDXServerAPI
 import cdx_toolkit
 from domainLatestUrl import DomainMonitor
-from hgPopular import bulk_scrape_and_save_model_urls
+from hgModelPopular import bulk_scrape_and_save_model_urls
 # Load environment variables
 load_dotenv()
 
