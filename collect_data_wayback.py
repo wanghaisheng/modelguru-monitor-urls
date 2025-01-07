@@ -166,6 +166,7 @@ def exact_url_timestamp(website_url,
                                    )
                     result.raise_for_status()
                     parse_url = result.json()
+                    print('---',parse_url)
 
                     if len(parse_url) < 2:
                         print("No more data to fetch.")
