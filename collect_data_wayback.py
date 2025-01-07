@@ -170,7 +170,7 @@ def exact_url_timestamp(website_url,
                         item['timestamp']=indexdate
                         items.append(item)
 
-                      print('======', items)
+                    print('======', items)
                       
                     break  # Exit proxy retry loop if successful
                 except (rq.RequestException, ValueError) as e:
