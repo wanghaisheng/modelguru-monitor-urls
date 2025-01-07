@@ -200,7 +200,7 @@ async def process_model_url(semaphore, session, item):
         model_url=item.get("model_url")
         print(f"[INFO] Processing model: {model_url}")
         item = await get_model_runs(session, item)
-        print(f"[INFO] save statics: {run_count}")
+        print(f"[INFO] save statics: {item}")
         
         if item is not None:
             await upsert_model_data(session, item)
@@ -283,9 +283,9 @@ async def main():
             if results and len(results)>1:
                 gindex=int(datetime.now().strftime('%Y%m%d'))
                 items=[]
-                for url in results:
+                for i in results:
                     item={}
-                    item['model_url']=url
+                    item['model_url']=i.get('url')
                     item['google_indexAt']=gindex
                     items.append(item)
                 await asyncio.gather(*(process_model_url(semaphore, session, item) for item in items))
