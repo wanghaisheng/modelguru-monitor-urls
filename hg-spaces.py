@@ -273,7 +273,7 @@ async def main():
             cleanitems=[]
             print('start clean urls',)
             uniqueurls=[]
-            for item in items:
+            for item in items[:100]:
                 url=item.get('url')
                 wayback_createAt=item.get('timestamp')
                 print('--',url)
@@ -281,6 +281,7 @@ async def main():
                     url=url.split('?')[0]
                 modelname=url.replace(baseUrl,'').split('/')
                 if len(modelname)<2:
+                    print('invalid url',url)
                     continue
 
                 url=baseUrl+modelname[0]+'/'+modelname[1]
