@@ -349,17 +349,12 @@ async def main():
                     item['model_url']=url
 
                     item['google_indexAt']=gindex
-                    items.append(item)
-                    new_models[url] = item
-                cleanitems = list(new_models.values())
+                    if not url in modelurls:
+                        existing_models.append(item)
             print('clean google search url item',cleanitems)
-            all_model_items=[]
             
-            if cleanitems !=[] and existing_models!=[]:
-                print('before combine',type(existing_models),type(cleanitems))
-                all_model_items = list(set(existing_models + cleanitems))
-
-            await asyncio.gather(*(process_model_url(semaphore, session, item) for item in all_model_items))
+            
+            await asyncio.gather(*(process_model_url(semaphore, session, item) for item in existing_models))
 
         print("[INFO] url detect complete.")
 
