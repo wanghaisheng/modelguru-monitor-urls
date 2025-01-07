@@ -194,7 +194,7 @@ def exact_url_timestamp(website_url,
                         print(f"Failed to fetch data after {proxy_retries} proxy attempts. Error: {e}")
                         progress_bar.close()
                         return items
-            print('current url index date', items)
+            print('current url index date', len(items))
 
             progress_bar.update(1)
 
