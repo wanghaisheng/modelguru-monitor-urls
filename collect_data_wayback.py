@@ -101,6 +101,7 @@ import random
 def load_proxies(url):
     if url is None:
       url='https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/socks5.txt'
+      # https://github.com/proxifly/free-proxy-list/blob/main/proxies/all/data.txt
     try:
         response = rq.get(url)
         response.raise_for_status()
@@ -144,10 +145,12 @@ def exact_url_timestamp(website_url,
                     # Select a random proxy from the list
                     proxy = get_random_proxy(proxies)
                     proxy_dict = None
-                    if proxy:
+                    if 'socks5' in proxy==False:
                         # Define the proxy for requests
                         proxy_dict = {'http': f'socks5://{proxy}', 'https': f'socks5://{proxy}'}
-
+                    else:
+                        proxy_dict = {'http': f'{proxy}', 'https': f'{proxy}'}
+                      
                     result = rq.get(url, proxies=proxy_dict)
                     result.raise_for_status()
                     parse_url = result.json()
