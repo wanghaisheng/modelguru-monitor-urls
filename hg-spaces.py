@@ -247,7 +247,7 @@ async def main():
             start_date = current_date - timedelta(days=365)
             file_path = 'hg.txt'
             items=exact_url_timestamp(
-                baseUrl,
+                baseUrl+'*',
                 max_count=5000,
                 chunk_size=1000,
                 sleep=5
