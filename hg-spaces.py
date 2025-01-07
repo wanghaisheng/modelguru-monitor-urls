@@ -101,7 +101,7 @@ async def get_existing_model_urls():
         
         async with aiohttp.ClientSession() as session:
             async with session.post(
-                f"{DATABASE_URL}/query", headers=HEADERS, json={"query": query}
+                f"{CLOUDFLARE_BASE_URL}/query", headers=HEADERS, json={"query": query}
             ) as response:
                 data = await response.json()
 
@@ -341,8 +341,8 @@ async def main():
                     item['google_indexAt']=gindex
                     items.append(item)
                     new_models[url] = item
-                cleanitems = list(unique_items.values())
-            all_model_items = list(set(existing_models + new_models))
+                cleanitems = list(new_models.values())
+            all_model_items = list(set(existing_models + cleanitems))
 
             await asyncio.gather(*(process_model_url(semaphore, session, item) for item in all_model_items))
 
