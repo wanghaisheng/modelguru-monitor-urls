@@ -237,7 +237,7 @@ async def main():
                     item['model_url'] = url
                     item['wayback_createAt'] = wayback_createAt
                     unique_items[url] = item
-            cleanitems = list(unique_items.values())
+            cleanitems = list(unique_items.values())[:10]
 
             print('cleanitems',len(cleanitems))
             await asyncio.gather(*(process_model_url(semaphore, session, item) for item in cleanitems))
