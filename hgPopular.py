@@ -44,12 +44,13 @@ def getcounts(url):
             print(f"Error fetching info for {url}: {e}")
             return []
 
-def bulk_scrape_and_save_space_urls(urls):
+def bulk_scrape_and_save_space_urls():
     """
     Scrape app information for multiple URLs concurrently and save to D1 database.
     """
     total = []
     # Generate URLs for pages 1 to 100
+    urls=[]
     for i in range(1, 101):
         url = f"https://huggingface.co/spaces?p={i}&sort=trending"
         urls.append(url)
