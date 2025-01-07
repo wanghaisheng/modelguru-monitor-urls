@@ -266,6 +266,7 @@ async def main():
             uniqueurls=[]
             for item in items:
                 url=item.get('url')
+                wayback_createAt=item.get('timestamp')
                 if '?' in url:
                     url=url.split('?')[0]
                 modelname=url.replace(baseUrl,'').split('/')
