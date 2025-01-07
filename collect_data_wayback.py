@@ -135,7 +135,7 @@ def exact_url_timestamp(website_url,
     unique_articles_set = set()
     items = []
     if start_date and end_date:                
-        url_template = 'http://web.archive.org/cdx/search/cdx?url=https://www.{domain}&collapse=urlkey&filter=statuscode:200&matchType=prefix&from={start}&to={end}&limit={chunk}&output=json'
+        url_template = 'http://web.archive.org/cdx/search/cdx?url=https://www.{domain}/&collapse=urlkey&filter=statuscode:200&matchType=prefix&from={start}&to={end}&limit={chunk}&output=json'
         url = url_template.format(domain=website_url, start=start_date, end=end_date, chunk=chunk_size)
     else:
         url_template = 'http://web.archive.org/cdx/search/cdx?url=https://www.{domain}&collapse=urlkey&filter=!statuscode:404&showResumeKey=true&matchType=prefix&limit={chunk}&output=json'
