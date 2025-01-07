@@ -162,7 +162,7 @@ def exact_url_timestamp(website_url,
                     if len(parse_url) < 2:
                         print("No more data to fetch.")
                         progress_bar.close()
-                        return url_list
+                        return items
                                         
                     for i in range(1, len(parse_url) - 1):
                         if len(parse_url[i]) < 5:
