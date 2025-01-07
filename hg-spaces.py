@@ -249,6 +249,9 @@ async def main():
             items=exact_url_timestamp(
                 baseUrl+'*',
                 max_count=5000,
+                start_date=int(start_date.strftime('%Y%m%d')),
+                end_date=int(current_date.strftime('%Y%m%d')),
+                
                 chunk_size=1000,
                 sleep=5
             )
