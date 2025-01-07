@@ -178,7 +178,7 @@ async def get_model_date(session, item, max_retries=3, retry_delay=5):
     item['wayback_createAt']=wayback_createAt
     item['cc_createAt']=cc_createAt
 
-async def upsert_model_data(session, max_retries=3, retry_delay=5):
+async def upsert_model_data(session,item, max_retries=3, retry_delay=5):
     model_url=item.get('model_url')
     run_count=item.get('run_count')
     google_indexAt=item.get('google_indexAt',None)
@@ -269,11 +269,12 @@ async def main():
             if len(items)<1:
                 return 
             cleanitems=[]
-            print('start clean url')
+            print('start clean urls',)
             uniqueurls=[]
             for item in items:
                 url=item.get('url')
                 wayback_createAt=item.get('timestamp')
+                print('--',url)
                 if '?' in url:
                     url=url.split('?')[0]
                 modelname=url.replace(baseUrl,'').split('/')
@@ -282,14 +283,18 @@ async def main():
 
                 url=baseUrl+modelname[0]+'/'+modelname[1]
                 if url in unique_items:
+                    print('model url added before')
                 
                     existing_item = unique_items[url]
                     
                     existing_wayback_createAt = existing_item.get('wayback_createAt')
                     if wayback_createAt < existing_wayback_createAt:
                         existing_item['wayback_createAt'] = wayback_createAt
-    
+                        print('new model url date is older',wayback_createAt)
+
                 else:
+                    print('add new model url ')
+                    
                     item['model_url'] = url
                     item['wayback_createAt'] = wayback_createAt
                     unique_items[url] = item
