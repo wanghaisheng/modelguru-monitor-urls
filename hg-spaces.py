@@ -179,6 +179,8 @@ async def get_model_date(session, item, max_retries=3, retry_delay=5):
     item['cc_createAt']=cc_createAt
 
 async def upsert_model_data(session,item, max_retries=3, retry_delay=5):
+    current_time = datetime.utcnow().isoformat()
+
     model_url=item.get('model_url')
     run_count=item.get('run_count')
     google_indexAt=item.get('google_indexAt',None)
@@ -327,7 +329,7 @@ async def main():
                     if '?' in url:
                         url=url.split('?')[0]
                     modelname=url.replace(baseUrl,'').split('/')
-                    if len(modelname)<2:
+                    if len(modelname)<4:
                         continue
                     url=baseUrl+modelname[0]+'/'+modelname[1]
                     if url in modelurls:
