@@ -11,6 +11,7 @@ from collect_data_wayback import collect_data_wayback,exact_url_timestamp
 from waybackpy import WaybackMachineCDXServerAPI
 import cdx_toolkit
 from domainLatestUrl import DomainMonitor
+from hgPopular import bulk_scrape_and_save_space_urls
 # Load environment variables
 load_dotenv()
 
@@ -240,6 +241,9 @@ async def process_model_url(semaphore, session, item):
         
         if item is not None:
             await upsert_model_data(session, item)
+async def process_popular_model(semaphore, session, item):
+    async with semaphore:
+        await upsert_model_data(session, item)
 
 # Main function
 async def main():
@@ -355,8 +359,13 @@ async def main():
             
             
             await asyncio.gather(*(process_model_url(semaphore, session, item) for item in existing_models))
-
+    
         print("[INFO] url detect complete.")
+        print("[INFO] update popular space count.")
+
+        popularspaces=bulk_scrape_and_save_space_urls()
+        await asyncio.gather(*(process_popular_model(semaphore, session, item) for item in popularspaces))
+
 
 
 if __name__ == "__main__":
