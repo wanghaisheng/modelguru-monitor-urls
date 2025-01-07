@@ -143,6 +143,8 @@ def exact_url_timestamp(website_url,
             for proxy_attempt in range(proxy_retries):  # Retry with different proxies if request fails
                 try:
                     # Select a random proxy from the list
+                    if proxies is None:
+                        proxies=load_proxies()
                     proxy = get_random_proxy(proxies)
                     proxy_dict = None
                     if 'socks5' in proxy==False:
