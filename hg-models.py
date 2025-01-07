@@ -362,7 +362,7 @@ async def main():
         print("[INFO] url detect complete.")
         print("[INFO] update popular model count.")
 
-        popularmodels=bulk_scrape_and_save_model_urls()
+        popularmodels=bulk_scrape_and_save_model_urls()[:10]
         await asyncio.gather(*(process_popular_model(semaphore, session, item) for item in popularmodels))
 
 
