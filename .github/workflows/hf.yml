@@ -20,16 +20,16 @@ jobs:
 
     - name: Install required Python dependencies
       run: |
-        pip install DataRecorder tqdm aiohttp pandas python-dotenv httpx cloudflare requests waybackpy cdx_toolkit bs4 lxml
+        pip install DrissionPage DataRecorder tqdm aiohttp pandas python-dotenv httpx cloudflare requests waybackpy cdx_toolkit bs4 lxml
 
-    - name: Run the Google search parser script
+    - name: Run the hg model count
       env:
         CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         CLOUDFLARE_D1_DATABASE_ID: ${{ secrets.CLOUDFLARE_D1_DATABASE_ID }}
       run: |
         python hg-spaces.py
-        python hg-spaces.py
+        python hg-models.py
 
     # - name: Commit the results to the repository if there's a change
       # run: |
