@@ -104,9 +104,9 @@ async def get_existing_model_urls():
                 f"{CLOUDFLARE_BASE_URL}/query", headers=HEADERS, json={"query": query}
             ) as response:
                 data = await response.json()
-
+                print('query existing data',)
                 if "result" in data:
-                    models = data["result"]
+                    models = data["result"]['results']
                     if models:
                         return models
                 else:
