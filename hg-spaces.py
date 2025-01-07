@@ -41,8 +41,9 @@ async def parse_sitemap(session, url):
         return []
 
 # Helper: Fetch model page and extract run count
-async def get_model_runs(session, url):
+async def get_model_runs(session, item):
     try:
+        url=item.get('model_url')
         # https://huggingface.co/spaces/AP123/IllusionDiffusion/discussions/94
         async with session.get(url) as response:
             response.raise_for_status()
@@ -55,7 +56,8 @@ async def get_model_runs(session, url):
                 elif 'm' in t:
                     t = int(float(t.replace('m', '')) * 1000000)
                 t = re.search(r'\d+', str(t)).group(0)
-                return int(t)
+                item['run_count']=t
+                return item
             else:
                 print(f"[WARNING] No run count found on page: {url}")
                 return None
@@ -80,12 +82,19 @@ async def create_table_if_not_exists(session):
     url = f"{CLOUDFLARE_BASE_URL}/query"
     async with session.post(url, headers=HEADERS, json=payload) as response:
         response.raise_for_status()
-        print("[INFO] Table huggingface_spaces_data checked/created successfully.")
+        result = await response.json()
+        
+        if result.get("success"):
+            print("[INFO] Table huggingface_spaces_data checked/created successfully.")
+            return True  # Assuming table creation was successful
+        return False  # Assuming table already existed
+        
 
 
 # Helper: Insert or update model data with retry and exception handling
-async def upsert_model_data(session, model_url, run_count,google_indexAt=None, max_retries=3, retry_delay=5):
+async def get_model_date(session, item, max_retries=3, retry_delay=5):
     current_time = datetime.utcnow().isoformat()
+    model_url=item.get('model_url')
     print('Try to find first index date of', model_url)
     user_agent = "check huggingface model's user agent"
     wayback_createAt = None
@@ -119,7 +128,16 @@ async def upsert_model_data(session, model_url, run_count,google_indexAt=None, m
                 
         # except Exception as e:
             # print('t failed:', e)
+    item['wayback_createAt']=wayback_createAt
+    item['cc_createAt']=cc_createAt
 
+async def upsert_model_data(session, max_retries=3, retry_delay=5):
+    model_url=item.get('model_url')
+    run_count=item.get('run_count')
+    google_indexAt=item.get('google_indexAt',None)
+    wayback_createAt=item.get('wayback_createAt',None)
+    cc_createAt=item.get('cc_createAt',None)
+    
     sql = f"""
     INSERT INTO huggingface_spaces_data (model_url, run_count, google_indexAt,wayback_createAt, cc_createAt, updateAt)
     VALUES ('{model_url}', {run_count}, 
@@ -157,14 +175,15 @@ async def upsert_model_data(session, model_url, run_count,google_indexAt=None, m
     print(f"[ERROR] Failed to upsert data for {model_url} after {max_retries} attempts.")
 
 # Process a single model URL
-async def process_model_url(semaphore, session, model_url,gindex=None):
+async def process_model_url(semaphore, session, item):
     async with semaphore:
+        model_url=item.get("model_url")
         print(f"[INFO] Processing model: {model_url}")
-        run_count = await get_model_runs(session, model_url)
+        item = await get_model_runs(session, item)
         print(f"[INFO] save statics: {run_count}")
         
-        if run_count is not None:
-            await upsert_model_data(session, model_url, run_count,google_indexAt=gindex)
+        if item is not None:
+            await upsert_model_data(session, item)
 
 # Main function
 async def main():
@@ -172,25 +191,14 @@ async def main():
     timeout = ClientTimeout(total=60)
     async with aiohttp.ClientSession(timeout=timeout) as session:
         print("[INFO] Starting sitemap parsing...")
-        await create_table_if_not_exists(session)
-        
-        url_domain = 'https://huggingface.co'
-        ROOT_SITEMAP_URL = f"{url_domain}/sitemap.xml"
-        model_urls=[]
-        model_urls = await parse_sitemap(session, ROOT_SITEMAP_URL)
-        print("[INFO] Sitemap parsing complete.")
-
-        model_urls = list(set(model_urls))
-        if not model_urls:
+        tablenewcreate=await create_table_if_not_exists(session)
+        if tablenewcreate:
             print('Using Wayback Machine as fallback')
             current_date = datetime.now()
             start_date = current_date - timedelta(days=365)
             file_path = 'hg.txt'
-            model_urls=collect_data_wayback(
+            items=exact_url_timestamp(
                 url_domain+'/spaces/',
-                file_path,
-                start_date=int(start_date.strftime('%Y%m%d')),
-                end_date=int(current_date.strftime('%Y%m%d')),
                 max_count=5000,
                 chunk_size=1000,
                 sleep=5
@@ -198,38 +206,65 @@ async def main():
             # if os.path.exists(file_path):
                 # with open(file_path, encoding='utf8') as f:
                     # model_urls = [line.strip() for line in f]
-        print('model_urls',len(model_urls))
-        print("[INFO] wayback check parsing complete.")
-        
-        baseUrl='https://huggingface.co/spaces/'
-        if len(model_urls)<1:
-            return 
-        cleanurls=[]
-        print('start clean url')
-        for url in model_urls:
-            if '?' in url:
-                url=url.split('?')[0]
-            modelname=url.replace(baseUrl,'').split('/')
-            if len(modelname)<2:
-                continue
+            print('items',len(items))
+            print("[INFO] wayback check parsing complete.")
+            unique_items = {}
 
-            url=baseUrl+modelname[0]+'/'+modelname[1]
-            cleanurls.append(url)
-        model_urls=list(set(cleanurls))[:10]
-        print('cleanurls',len(model_urls))
-        await asyncio.gather(*(process_model_url(semaphore, session, url) for url in model_urls))
-        
-        d=DomainMonitor()
-        search_model_urls=[]
-        results=d.monitor_site(site=baseUrl,time_range='24h')
-        if len(results)>1:
-            for r in results:
-                search_model_urls.append(r.get('url'))
-        search_model_urls=list(set(search_model_urls))
-        print("[INFO] google search check  complete.")
-        gindex=int(datetime.now().strftime('%Y%m%d'))
+            baseUrl='https://huggingface.co/spaces/'
+            if len(items)<1:
+                return 
+            cleanitems=[]
+            print('start clean url')
+            uniqueurls=[]
+            for item in items:
+                url=item.get('url')
+                if '?' in url:
+                    url=url.split('?')[0]
+                modelname=url.replace(baseUrl,'').split('/')
+                if len(modelname)<2:
+                    continue
 
-        await asyncio.gather(*(process_model_url(semaphore, session, url,gindex) for url in search_model_urls))
+                url=baseUrl+modelname[0]+'/'+modelname[1]
+                if url in unique_items:
+                
+                    existing_item = unique_items[url]
+                    
+                    existing_wayback_createAt = existing_item.get('wayback_createAt')
+                    if wayback_createAt < existing_wayback_createAt:
+                        existing_item['wayback_createAt'] = wayback_createAt
+    
+                else:
+                    item['model_url'] = url
+                    item['wayback_createAt'] = wayback_createAt
+                    unique_items[url] = item
+            cleanitems = list(unique_items.values())
+
+            print('cleanitems',len(cleanitems))
+            await asyncio.gather(*(process_model_url(semaphore, session, item) for item in cleanitems))
+        else:
+            url_domain = 'https://huggingface.co'
+            ROOT_SITEMAP_URL = f"{url_domain}/sitemap.xml"
+            model_urls=[]
+            model_urls = await parse_sitemap(session, ROOT_SITEMAP_URL)
+            print("[INFO] Sitemap parsing complete.")
+            model_urls = list(set(model_urls))
+       
+            d=DomainMonitor()
+            search_model_urls=[]
+            results=d.monitor_site(site=baseUrl,time_range='24h')
+            if len(results)>1:
+                for r in results:
+                    search_model_urls.append(r.get('url'))
+            search_model_urls=list(set(search_model_urls))
+            print("[INFO] google search check  complete.")
+            gindex=int(datetime.now().strftime('%Y%m%d'))
+            items=[]
+            for i in search_model_urls:
+                item={}
+                item['model_url']=url
+                item['google_indexAt']=gindex
+                items.append(item)
+            await asyncio.gather(*(process_model_url(semaphore, session, item) for item in items))
 
         print("[INFO] url detect complete.")
 
