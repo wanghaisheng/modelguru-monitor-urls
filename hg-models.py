@@ -283,7 +283,6 @@ async def main():
             uniqueurls=[]
             for item in items:
                 url=item.get('url')
-                url=url.replace('https:')
                 wayback_createAt=item.get('timestamp')
                 print('--',url)
                 if '?' in url:
