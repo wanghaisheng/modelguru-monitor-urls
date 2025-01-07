@@ -28,7 +28,7 @@ jobs:
         CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         CLOUDFLARE_D1_DATABASE_ID: ${{ secrets.CLOUDFLARE_D1_DATABASE_ID }}
       run: |
-        python hg-spaces.py
+        # python hg-spaces.py
         python hg-models.py
 
     # - name: Commit the results to the repository if there's a change
