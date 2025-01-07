@@ -60,10 +60,14 @@ async def get_model_runs(session, item):
                 return item
             else:
                 print(f"[WARNING] No run count found on page: {url}")
-                return None
+                item['run_count']=0
+                
+                return item
     except Exception as e:
         print(f"[ERROR] Failed to fetch model page {url}: {e}")
-        return None
+        item['run_count']=0
+        
+        return item
 
 # Helper: Create table in the database
 async def create_table_if_not_exists(session):
