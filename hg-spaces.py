@@ -319,7 +319,7 @@ async def main():
             print('cleanitems',len(cleanitems))
             await asyncio.gather(*(process_model_url(semaphore, session, item) for item in cleanitems))
         modelurls=[]
-        existing_models=await get_existing_model_urls()
+        existing_models=await get_existing_model_data()
         print('existing models count',len(existing_models))
         
         if existing_models!=[]:
