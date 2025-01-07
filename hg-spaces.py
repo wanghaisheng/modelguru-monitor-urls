@@ -307,7 +307,9 @@ async def main():
             await asyncio.gather(*(process_model_url(semaphore, session, item) for item in cleanitems))
         existing_models=await get_existing_model_urls()
         print('existing models count',len(existing_models))
-        modelurls=[  item.get('model_url')   for item in existing_models]            
+        modelurls=[]
+        if existing_models!=[]:
+            modelurls=[  item.get('model_url')   for item in existing_models]            
         if supportsitemap:
             url_domain = 'https://huggingface.co'
             ROOT_SITEMAP_URL = f"{url_domain}/sitemap.xml"
@@ -342,7 +344,9 @@ async def main():
                     items.append(item)
                     new_models[url] = item
                 cleanitems = list(new_models.values())
-            all_model_items = list(set(existing_models + cleanitems))
+            print('clean google search url item',cleanitems)
+            if cleanitems !=[] and existing_models!=[]:
+                all_model_items = list(set(existing_models + cleanitems))
 
             await asyncio.gather(*(process_model_url(semaphore, session, item) for item in all_model_items))
 
