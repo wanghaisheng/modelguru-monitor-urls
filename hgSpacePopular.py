@@ -62,8 +62,7 @@ def bulk_scrape_and_save_space_urls():
         total.extend(result)
 
     # Process the total list of items
-    batch_process_in_chunks(total, process_function=batch_process_updated_space_count)
-
+    return total
 if __name__ == "__main__":
     # Create the table before scraping
     # create_app_profiles_table()
