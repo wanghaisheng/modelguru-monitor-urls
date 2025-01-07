@@ -27,7 +27,7 @@ def getcounts(url):
             tab.get(url)
             
             # Extract app details
-            articles = tab.ele('.pb-12').eles("t:article")
+            articles = tab.eles("t:article")
             items = []
             for a in articles:
                 model_url = "https://huggingface.co/spaces/" + a.ele('t:a').link
