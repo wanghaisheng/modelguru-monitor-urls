@@ -104,7 +104,7 @@ async def get_existing_model_urls():
                 f"{CLOUDFLARE_BASE_URL}/query", headers=HEADERS, json={"query": query}
             ) as response:
                 data = await response.json()
-                print('query existing data',)
+                print('query existing data',data)
                 if "result" in data:
                     models = data["result"]['results']
                     if models:
@@ -305,8 +305,6 @@ async def main():
 
             print('cleanitems',len(cleanitems))
             await asyncio.gather(*(process_model_url(semaphore, session, item) for item in cleanitems))
-        existing_models=await get_existing_model_urls()
-        print('existing models count',len(existing_models))
         modelurls=[]
         if existing_models!=[]:
             modelurls=[  item.get('model_url')   for item in existing_models]            
@@ -345,6 +343,10 @@ async def main():
                     new_models[url] = item
                 cleanitems = list(new_models.values())
             print('clean google search url item',cleanitems)
+            existing_models=await get_existing_model_urls()
+            print('existing models count',len(existing_models))
+            all_model_items=[]
+            
             if cleanitems !=[] and existing_models!=[]:
                 all_model_items = list(set(existing_models + cleanitems))
 
