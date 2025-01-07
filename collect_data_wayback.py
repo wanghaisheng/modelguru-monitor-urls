@@ -166,7 +166,7 @@ def exact_url_timestamp(website_url,
                                    )
                     result.raise_for_status()
                     parse_url = result.json()
-                    print('---',url,parse_url)
+                    # print('---',url,parse_url)
 
                     if len(parse_url) < 2:
                         print("No more data to fetch.")
@@ -183,7 +183,7 @@ def exact_url_timestamp(website_url,
                         item['timestamp']=indexdate
                         items.append(item)
 
-                    print('======', items)
+                    print('===founding===', len(items))
                       
                     break  # Exit proxy retry loop if successful
                 except (rq.RequestException, ValueError) as e:
