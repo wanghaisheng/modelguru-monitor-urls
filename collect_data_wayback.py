@@ -121,6 +121,8 @@ def exact_url_timestamp(website_url,
                          retries=5,
                          max_count=1000,
                          chunk_size=100,
+                         start_date=None,
+                         end_date=None,
                         
                          proxy_retries=3,  # Added retry limit for proxies
                          proxies=None):  # Added proxies parameter
@@ -132,8 +134,14 @@ def exact_url_timestamp(website_url,
 
     unique_articles_set = set()
     items = []
-    url = f'http://web.archive.org/cdx/search/cdx?url=https://www.{website_url}&collapse=urlkey&filter=!statuscode:404&showResumeKey=true&matchType=exact&limit=1&output=json'    
-    # max_count=1
+    if start and end:                
+        url_template = 'http://web.archive.org/cdx/search/cdx?url=https://www.{domain}&collapse=urlkey&filter=!statuscode:404&showResumeKey=true&matchType=prefix&from={start}&to={end}&limit={chunk}&output=json'
+        url = url_template.format(domain=website_url, start=start_date, end=end_date, chunk=chunk_size)
+    else:
+        url_template = 'http://web.archive.org/cdx/search/cdx?url=https://www.{domain}&collapse=urlkey&filter=!statuscode:404&showResumeKey=true&matchType=prefix&limit={chunk}&output=json'
+        url = url_template.format(domain=website_url, chunk=chunk_size)
+
+                           # max_count=1
     # chunk_size=1
     its = max_count // chunk_size
     progress_bar = tqdm(total=its)
