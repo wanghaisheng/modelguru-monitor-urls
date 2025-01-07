@@ -5,7 +5,6 @@ import concurrent.futures
 from DataRecorder import Recorder
 from getbrowser import setup_chrome
 from dotenv import load_dotenv
-from save_app_profile import *
 load_dotenv()
 
 # Constants for D1 Database
