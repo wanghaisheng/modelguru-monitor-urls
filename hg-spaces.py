@@ -191,6 +191,8 @@ async def main():
     timeout = ClientTimeout(total=60)
     supportsitemap=False
     supportgooglesearch=True
+    baseUrl='https://huggingface.co/spaces/'
+    
     async with aiohttp.ClientSession(timeout=timeout) as session:
         print("[INFO] Starting sitemap parsing...")
         tablenewcreate=await create_table_if_not_exists(session)
@@ -200,7 +202,7 @@ async def main():
             start_date = current_date - timedelta(days=365)
             file_path = 'hg.txt'
             items=exact_url_timestamp(
-                url_domain+'/spaces/',
+                baseUrl,
                 max_count=5000,
                 chunk_size=1000,
                 sleep=5
@@ -212,7 +214,6 @@ async def main():
             print("[INFO] wayback check parsing complete.")
             unique_items = {}
 
-            baseUrl='https://huggingface.co/spaces/'
             if len(items)<1:
                 return 
             cleanitems=[]
