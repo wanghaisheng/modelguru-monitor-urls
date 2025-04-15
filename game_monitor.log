@@ -22,3 +22,6 @@
 2025-04-14 12:13:54,653 - INFO - Monitoring nomal url https://www.google.com/search?q=site%3Ahttps%3A//huggingface.co/models/&tbs=qdr%3Ad&num=100&start=0 for 24h, page 1
 2025-04-14 12:13:54,653 - INFO - Monitoring https://huggingface.co/models/ for 24h, page 1
 2025-04-14 12:13:55,582 - INFO - No more results found for https://huggingface.co/models/ on page 1
+2025-04-15 12:13:08,585 - INFO - Monitoring nomal url https://www.google.com/search?q=site%3Ahttps%3A//huggingface.co/models/&tbs=qdr%3Ad&num=100&start=0 for 24h, page 1
+2025-04-15 12:13:08,585 - INFO - Monitoring https://huggingface.co/models/ for 24h, page 1
+2025-04-15 12:13:09,222 - INFO - No more results found for https://huggingface.co/models/ on page 1
