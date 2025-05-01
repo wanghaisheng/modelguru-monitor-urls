@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 from DrissionPage import Chromium, ChromiumOptions
-import os
+import os,sys
 import json
 import platform
 import subprocess
