@@ -136,7 +136,8 @@ async def is_table_populated(session):
             result = await response.json()
             if result.get("success"):
                 count = result.get("result")[0].get("count")
-                return count > 0
+                print('===',result.get('successs'))
+                return True
             return False
     except aiohttp.ClientError as e:
         print(f"[ERROR] Failed to check table data: {e}")
