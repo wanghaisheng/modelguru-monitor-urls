@@ -74,3 +74,6 @@
 2025-05-01 04:38:54,628 - INFO - Monitoring https://huggingface.co/models/ for 24h, page 1
 2025-05-01 04:38:56,027 - INFO - Total results: 17, Total pages: 1
 2025-05-01 04:38:56,090 - INFO - No more results found for https://huggingface.co/models/ on page 1
+2025-05-01 05:05:43,659 - INFO - Monitoring nomal url https://www.google.com/search?q=site%3Ahttps%3A//huggingface.co/models/&tbs=qdr%3Ad&num=100&start=0 for 24h, page 1
+2025-05-01 05:05:43,659 - INFO - Monitoring https://huggingface.co/models/ for 24h, page 1
+2025-05-01 05:05:44,874 - INFO - No more results found for https://huggingface.co/models/ on page 1
