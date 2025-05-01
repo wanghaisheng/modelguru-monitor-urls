@@ -74,9 +74,11 @@ def setup_chrome():
     # co.set_browser_path(chrome_path)
     # co.set_argument('--no-sandbox')  # 无沙盒模式
     # co.set_argument('--headless=new')  # 强制无头模式
+    if sys.platform == "linux":
+        co.set_argument("--no-sandbox")
 
-    # co.headless()  # 无头模式        co.new_env()
-    co.new_env()
+    co.auto_port()
+    # co.new_env()
     co.headless()
 
     return Chromium(co)
