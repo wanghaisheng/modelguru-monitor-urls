@@ -357,7 +357,7 @@ async def main():
                     item['google_indexAt']=gindex
                     if not url in modelurls:
                         existing_models.append(item)
-            print('clean google search url item',cleanitems)
+            print('clean google search url item',existing_models)
             
             
             await asyncio.gather(*(process_model_url(semaphore, session, item) for item in existing_models))
