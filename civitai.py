@@ -59,10 +59,11 @@ async def get_model_runs(url, session):
                         
                         t = run_span.get_text(strip=True).lower()
                         t=t.replace('stats','').strip()
+                        print('start to format stats',t)
                         if 'k' in t:
-                            t = int(float(t.replace('k', '')) * 1000)
+                            t = (float(t.replace('k', '')) * 1000)
                         elif 'm' in t:
-                            t = int(float(t.replace('m', '')) * 1000000)
+                            t = (float(t.replace('m', '')) * 1000000)
                         print('after k,m processing',t)
                         if ',' in t:
                             t = t.replace(',', '')
