@@ -63,6 +63,7 @@ async def get_model_runs(url, session):
                             t = int(float(t.replace('k', '')) * 1000)
                         elif 'm' in t:
                             t = int(float(t.replace('m', '')) * 1000000)
+                        print('after k,m processing',t)
                         if ',' in t:
                             t = t.replace(',', '')
                             
