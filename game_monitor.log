@@ -526,3 +526,305 @@ ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after 
 The above exception was the direct cause of the following exception:
 
 aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-30 12:09:49,647 - INFO - Monitoring nomal url https://www.google.com/search?q=site%3Ahttps%3A//huggingface.co/models/&tbs=qdr%3Ad&num=100&start=0 for 24h, page 1
+2025-05-30 12:09:49,647 - INFO - Monitoring https://huggingface.co/models/ for 24h, page 1
+2025-05-30 12:09:52,878 - INFO - No more results found for https://huggingface.co/models/ on page 1
+2025-05-30 12:09:53,029 - ERROR - Future exception was never retrieved
+future: <Future finished exception=ClientConnectionError('Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)')>
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/asyncio/sslproto.py", line 648, in _do_shutdown
+    self._sslobj.unwrap()
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/ssl.py", line 983, in unwrap
+    return self._sslobj.shutdown()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+
+The above exception was the direct cause of the following exception:
+
+aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-30 12:09:53,202 - ERROR - Future exception was never retrieved
+future: <Future finished exception=ClientConnectionError('Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)')>
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/asyncio/sslproto.py", line 648, in _do_shutdown
+    self._sslobj.unwrap()
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/ssl.py", line 983, in unwrap
+    return self._sslobj.shutdown()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+
+The above exception was the direct cause of the following exception:
+
+aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-30 12:09:53,215 - ERROR - Future exception was never retrieved
+future: <Future finished exception=ClientConnectionError('Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)')>
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/asyncio/sslproto.py", line 648, in _do_shutdown
+    self._sslobj.unwrap()
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/ssl.py", line 983, in unwrap
+    return self._sslobj.shutdown()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+
+The above exception was the direct cause of the following exception:
+
+aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-30 12:09:53,320 - ERROR - Future exception was never retrieved
+future: <Future finished exception=ClientConnectionError('Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)')>
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/asyncio/sslproto.py", line 648, in _do_shutdown
+    self._sslobj.unwrap()
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/ssl.py", line 983, in unwrap
+    return self._sslobj.shutdown()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+
+The above exception was the direct cause of the following exception:
+
+aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-30 12:09:53,335 - ERROR - Future exception was never retrieved
+future: <Future finished exception=ClientConnectionError('Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)')>
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/asyncio/sslproto.py", line 648, in _do_shutdown
+    self._sslobj.unwrap()
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/ssl.py", line 983, in unwrap
+    return self._sslobj.shutdown()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+
+The above exception was the direct cause of the following exception:
+
+aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-30 12:09:53,347 - ERROR - Future exception was never retrieved
+future: <Future finished exception=ClientConnectionError('Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)')>
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/asyncio/sslproto.py", line 648, in _do_shutdown
+    self._sslobj.unwrap()
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/ssl.py", line 983, in unwrap
+    return self._sslobj.shutdown()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+
+The above exception was the direct cause of the following exception:
+
+aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-30 12:09:53,371 - ERROR - Future exception was never retrieved
+future: <Future finished exception=ClientConnectionError('Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)')>
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/asyncio/sslproto.py", line 648, in _do_shutdown
+    self._sslobj.unwrap()
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/ssl.py", line 983, in unwrap
+    return self._sslobj.shutdown()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+
+The above exception was the direct cause of the following exception:
+
+aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-30 12:11:20,859 - ERROR - Future exception was never retrieved
+future: <Future finished exception=ClientConnectionError('Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)')>
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/asyncio/sslproto.py", line 648, in _do_shutdown
+    self._sslobj.unwrap()
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/ssl.py", line 983, in unwrap
+    return self._sslobj.shutdown()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+
+The above exception was the direct cause of the following exception:
+
+aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-30 12:11:26,330 - ERROR - Future exception was never retrieved
+future: <Future finished exception=ClientConnectionError('Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)')>
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/asyncio/sslproto.py", line 648, in _do_shutdown
+    self._sslobj.unwrap()
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/ssl.py", line 983, in unwrap
+    return self._sslobj.shutdown()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+
+The above exception was the direct cause of the following exception:
+
+aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-30 12:11:26,426 - ERROR - Future exception was never retrieved
+future: <Future finished exception=ClientConnectionError('Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)')>
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/asyncio/sslproto.py", line 648, in _do_shutdown
+    self._sslobj.unwrap()
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/ssl.py", line 983, in unwrap
+    return self._sslobj.shutdown()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+
+The above exception was the direct cause of the following exception:
+
+aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-30 12:11:26,446 - ERROR - Future exception was never retrieved
+future: <Future finished exception=ClientConnectionError('Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)')>
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/asyncio/sslproto.py", line 648, in _do_shutdown
+    self._sslobj.unwrap()
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/ssl.py", line 983, in unwrap
+    return self._sslobj.shutdown()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+
+The above exception was the direct cause of the following exception:
+
+aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-30 12:11:26,450 - ERROR - Future exception was never retrieved
+future: <Future finished exception=ClientConnectionError('Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)')>
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/asyncio/sslproto.py", line 648, in _do_shutdown
+    self._sslobj.unwrap()
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/ssl.py", line 983, in unwrap
+    return self._sslobj.shutdown()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+
+The above exception was the direct cause of the following exception:
+
+aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-30 12:11:26,454 - ERROR - Future exception was never retrieved
+future: <Future finished exception=ClientConnectionError('Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)')>
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/asyncio/sslproto.py", line 648, in _do_shutdown
+    self._sslobj.unwrap()
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/ssl.py", line 983, in unwrap
+    return self._sslobj.shutdown()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+
+The above exception was the direct cause of the following exception:
+
+aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-30 12:11:31,438 - ERROR - Future exception was never retrieved
+future: <Future finished exception=ClientConnectionError('Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)')>
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/asyncio/sslproto.py", line 648, in _do_shutdown
+    self._sslobj.unwrap()
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/ssl.py", line 983, in unwrap
+    return self._sslobj.shutdown()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+
+The above exception was the direct cause of the following exception:
+
+aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-30 12:11:31,513 - ERROR - Future exception was never retrieved
+future: <Future finished exception=ClientConnectionError('Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)')>
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/asyncio/sslproto.py", line 648, in _do_shutdown
+    self._sslobj.unwrap()
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/ssl.py", line 983, in unwrap
+    return self._sslobj.shutdown()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+
+The above exception was the direct cause of the following exception:
+
+aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-30 12:11:31,541 - ERROR - Future exception was never retrieved
+future: <Future finished exception=ClientConnectionError('Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)')>
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/asyncio/sslproto.py", line 648, in _do_shutdown
+    self._sslobj.unwrap()
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/ssl.py", line 983, in unwrap
+    return self._sslobj.shutdown()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+
+The above exception was the direct cause of the following exception:
+
+aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-30 12:11:31,582 - ERROR - Future exception was never retrieved
+future: <Future finished exception=ClientConnectionError('Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)')>
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/asyncio/sslproto.py", line 648, in _do_shutdown
+    self._sslobj.unwrap()
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/ssl.py", line 983, in unwrap
+    return self._sslobj.shutdown()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+
+The above exception was the direct cause of the following exception:
+
+aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-30 12:11:31,597 - ERROR - Future exception was never retrieved
+future: <Future finished exception=ClientConnectionError('Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)')>
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/asyncio/sslproto.py", line 648, in _do_shutdown
+    self._sslobj.unwrap()
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/ssl.py", line 983, in unwrap
+    return self._sslobj.shutdown()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+
+The above exception was the direct cause of the following exception:
+
+aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-30 12:11:31,598 - ERROR - Future exception was never retrieved
+future: <Future finished exception=ClientConnectionError('Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)')>
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/asyncio/sslproto.py", line 648, in _do_shutdown
+    self._sslobj.unwrap()
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/ssl.py", line 983, in unwrap
+    return self._sslobj.shutdown()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+
+The above exception was the direct cause of the following exception:
+
+aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-30 12:11:31,600 - ERROR - Future exception was never retrieved
+future: <Future finished exception=ClientConnectionError('Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)')>
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/asyncio/sslproto.py", line 648, in _do_shutdown
+    self._sslobj.unwrap()
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/ssl.py", line 983, in unwrap
+    return self._sslobj.shutdown()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+
+The above exception was the direct cause of the following exception:
+
+aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-30 12:11:31,601 - ERROR - Future exception was never retrieved
+future: <Future finished exception=ClientConnectionError('Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)')>
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/asyncio/sslproto.py", line 648, in _do_shutdown
+    self._sslobj.unwrap()
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/ssl.py", line 983, in unwrap
+    return self._sslobj.shutdown()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+
+The above exception was the direct cause of the following exception:
+
+aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-30 12:11:31,616 - ERROR - Future exception was never retrieved
+future: <Future finished exception=ClientConnectionError('Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)')>
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/asyncio/sslproto.py", line 648, in _do_shutdown
+    self._sslobj.unwrap()
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/ssl.py", line 983, in unwrap
+    return self._sslobj.shutdown()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+
+The above exception was the direct cause of the following exception:
+
+aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-30 12:11:31,667 - ERROR - Future exception was never retrieved
+future: <Future finished exception=ClientConnectionError('Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)')>
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/asyncio/sslproto.py", line 648, in _do_shutdown
+    self._sslobj.unwrap()
+  File "/opt/hostedtoolcache/Python/3.11.12/x64/lib/python3.11/ssl.py", line 983, in unwrap
+    return self._sslobj.shutdown()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+
+The above exception was the direct cause of the following exception:
+
+aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
