@@ -828,3 +828,6 @@ ssl.SSLError: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after 
 The above exception was the direct cause of the following exception:
 
 aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICATION_DATA_AFTER_CLOSE_NOTIFY] application data after close notify (_ssl.c:2716)
+2025-05-31 12:09:11,325 - INFO - Monitoring nomal url https://www.google.com/search?q=site%3Ahttps%3A//huggingface.co/models/&tbs=qdr%3Ad&num=100&start=0 for 24h, page 1
+2025-05-31 12:09:11,325 - INFO - Monitoring https://huggingface.co/models/ for 24h, page 1
+2025-05-31 12:09:14,868 - INFO - No more results found for https://huggingface.co/models/ on page 1
