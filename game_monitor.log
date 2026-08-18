@@ -1624,3 +1624,6 @@ aiohttp.client_exceptions.ClientConnectionError: Connection lost: [SSL: APPLICAT
 2026-08-17 12:18:20,040 - INFO - Monitoring nomal url https://www.google.com/search?q=site%3Ahttps%3A//huggingface.co/models/&tbs=qdr%3Ad&num=100&start=0 for 24h, page 1
 2026-08-17 12:18:20,040 - INFO - Monitoring https://huggingface.co/models/ for 24h, page 1
 2026-08-17 12:18:21,704 - INFO - No more results found for https://huggingface.co/models/ on page 1
+2026-08-18 12:20:19,569 - INFO - Monitoring nomal url https://www.google.com/search?q=site%3Ahttps%3A//huggingface.co/models/&tbs=qdr%3Ad&num=100&start=0 for 24h, page 1
+2026-08-18 12:20:19,569 - INFO - Monitoring https://huggingface.co/models/ for 24h, page 1
+2026-08-18 12:20:21,023 - INFO - No more results found for https://huggingface.co/models/ on page 1
